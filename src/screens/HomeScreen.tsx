@@ -6,11 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  Platform,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHistory } from '../hooks/useHistory';
@@ -29,13 +27,16 @@ const SUBJECTS: { label: Subject; icon: string }[] = [
   { label: 'Literature', icon: '📖' },
 ];
 
-const COLORS = {
-  primary: '#6C63FF',
-  secondary: '#FF6584',
-  background: '#F8F9FE',
-  text: '#2D3748',
-  textLight: '#718096',
-  white: '#FFFFFF',
+const C = {
+  bg: '#0B0B0B',
+  surface: '#1A1A1A',
+  surfaceHigh: '#242424',
+  border: '#2C2C2E',
+  text: '#FFFFFF',
+  textMuted: '#8E8E93',
+  textDim: '#48484A',
+  accent: '#FFFFFF',
+  accentDim: 'rgba(255,255,255,0.08)',
 };
 
 export default function HomeScreen() {
@@ -52,58 +53,48 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+
         {/* Header */}
-        <LinearGradient
-          colors={['#6C63FF', '#9F97FF']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.header}
-        >
-          <View style={styles.headerTop}>
-            <View>
-              <Text style={styles.brandName}>Tutorly</Text>
-              <Text style={styles.tagline}>Your AI Study Buddy ✨</Text>
-            </View>
-            <View style={styles.statsBubble}>
-              <Text style={styles.statsNumber}>{history.length}</Text>
-              <Text style={styles.statsLabel}>Solved</Text>
-            </View>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.brandName}>Tutorly</Text>
+            <Text style={styles.tagline}>AI Homework Helper</Text>
           </View>
+          <View style={styles.statsBubble}>
+            <Text style={styles.statsNumber}>{history.length}</Text>
+            <Text style={styles.statsLabel}>solved</Text>
+          </View>
+        </View>
 
-          <Text style={styles.headerSubtext}>
-            Snap a photo of any homework problem and get instant step-by-step help
+        {/* Scan card */}
+        <View style={styles.scanCard}>
+          <ScanButton onPress={() => navigation.navigate('Scan')} size={80} />
+          <Text style={styles.scanTitle}>Scan a Problem</Text>
+          <Text style={styles.scanSubtitle}>
+            Point your camera at any homework question for instant step-by-step help
           </Text>
-        </LinearGradient>
-
-        {/* Scan CTA */}
-        <View style={styles.scanSection}>
-          <View style={styles.scanCard}>
-            <ScanButton onPress={() => navigation.navigate('Scan')} size={80} />
-            <Text style={styles.scanTitle}>Scan a Problem</Text>
-            <Text style={styles.scanSubtitle}>Point your camera at any homework question</Text>
-            <View style={styles.divider} />
-            <TouchableOpacity
-              style={styles.galleryBtn}
-              onPress={() => navigation.navigate('Scan')}
-            >
-              <Ionicons name="images-outline" size={18} color={COLORS.primary} />
-              <Text style={styles.galleryBtnText}>Choose from Gallery</Text>
-            </TouchableOpacity>
-          </View>
+          <View style={styles.divider} />
+          <TouchableOpacity
+            style={styles.galleryBtn}
+            onPress={() => navigation.navigate('Scan')}
+          >
+            <Ionicons name="images-outline" size={17} color={C.textMuted} />
+            <Text style={styles.galleryBtnText}>Choose from Gallery</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Subject chips */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Subjects We Cover</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
+          <Text style={styles.sectionTitle}>Subjects</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {SUBJECTS.map((s) => (
               <TouchableOpacity
                 key={s.label}
                 style={styles.chip}
                 onPress={() => navigation.navigate('Scan')}
-                activeOpacity={0.75}
+                activeOpacity={0.6}
               >
                 <Text style={styles.chipIcon}>{s.icon}</Text>
                 <Text style={styles.chipLabel}>{s.label}</Text>
@@ -112,11 +103,11 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Recent history */}
+        {/* Recent */}
         {recentItems.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Problems</Text>
+              <Text style={styles.sectionTitle}>Recent</Text>
               <TouchableOpacity onPress={() => navigation.getParent()?.navigate('History')}>
                 <Text style={styles.seeAll}>See all</Text>
               </TouchableOpacity>
@@ -132,17 +123,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Tips banner */}
-        <View style={styles.tipCard}>
-          <Ionicons name="bulb-outline" size={24} color="#ECC94B" />
-          <View style={styles.tipContent}>
-            <Text style={styles.tipTitle}>Pro Tip</Text>
-            <Text style={styles.tipText}>
-              For best results, make sure the problem is well-lit and fully in frame.
-            </Text>
-          </View>
-        </View>
-
         <View style={styles.bottomPad} />
       </ScrollView>
     </SafeAreaView>
@@ -150,88 +130,72 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
-  },
-  scroll: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+  safeArea: { flex: 1, backgroundColor: C.bg },
+  scroll: { flex: 1, backgroundColor: C.bg },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 36,
-  },
-  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 20,
   },
   brandName: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '800',
-    color: COLORS.white,
+    color: C.text,
     letterSpacing: -0.5,
   },
   tagline: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    color: C.textMuted,
     marginTop: 2,
   },
   statsBubble: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 16,
+    backgroundColor: C.surface,
+    borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: C.border,
   },
   statsNumber: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
-    color: COLORS.white,
+    color: C.text,
   },
   statsLabel: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.85)',
+    color: C.textMuted,
     fontWeight: '600',
   },
-  headerSubtext: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    lineHeight: 20,
-  },
-  scanSection: {
-    marginTop: -20,
-    paddingHorizontal: 16,
-  },
   scanCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 24,
+    marginHorizontal: 16,
+    backgroundColor: C.surface,
+    borderRadius: 20,
     padding: 28,
     alignItems: 'center',
-    shadowColor: '#6C63FF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    borderWidth: 1,
+    borderColor: C.border,
+    marginBottom: 24,
   },
   scanTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginTop: 16,
+    fontSize: 19,
+    fontWeight: '700',
+    color: C.text,
+    marginTop: 18,
   },
   scanSubtitle: {
-    fontSize: 14,
-    color: COLORS.textLight,
-    marginTop: 4,
+    fontSize: 13,
+    color: C.textMuted,
+    marginTop: 6,
     textAlign: 'center',
+    lineHeight: 19,
   },
   divider: {
     height: 1,
-    backgroundColor: '#EEF0F5',
+    backgroundColor: C.border,
     width: '100%',
     marginVertical: 18,
   },
@@ -239,21 +203,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingVertical: 10,
-    backgroundColor: 'rgba(108, 99, 255, 0.08)',
+    backgroundColor: C.surfaceHigh,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(108, 99, 255, 0.2)',
+    borderColor: C.border,
   },
   galleryBtnText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: C.textMuted,
   },
   section: {
     paddingHorizontal: 16,
-    marginTop: 24,
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -262,71 +226,33 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
-    color: COLORS.text,
+    color: C.text,
     marginBottom: 12,
   },
   seeAll: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: COLORS.primary,
-  },
-  chipsRow: {
-    flexDirection: 'row',
+    color: C.textMuted,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: COLORS.white,
+    backgroundColor: C.surface,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 9,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    borderColor: C.border,
   },
-  chipIcon: {
-    fontSize: 14,
-  },
+  chipIcon: { fontSize: 13 },
   chipLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: C.textMuted,
   },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    marginHorizontal: 16,
-    marginTop: 24,
-    backgroundColor: '#FFFBEB',
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#FEF08A',
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#92400E',
-    marginBottom: 2,
-  },
-  tipText: {
-    fontSize: 13,
-    color: '#78350F',
-    lineHeight: 18,
-  },
-  bottomPad: {
-    height: 32,
-  },
+  bottomPad: { height: 32 },
 });

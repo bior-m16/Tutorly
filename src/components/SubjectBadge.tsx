@@ -2,16 +2,29 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Subject } from '../types';
 
-const SUBJECT_COLORS: Record<Subject, { bg: string; text: string; icon: string }> = {
-  Math: { bg: '#EBF4FF', text: '#3182CE', icon: '∑' },
-  Physics: { bg: '#EBF8FF', text: '#0987A0', icon: '⚛' },
-  Chemistry: { bg: '#F0FFF4', text: '#276749', icon: '⚗' },
-  Biology: { bg: '#F0FFF4', text: '#22543D', icon: '🧬' },
-  History: { bg: '#FFFAF0', text: '#C05621', icon: '📜' },
-  Literature: { bg: '#FAF5FF', text: '#6B46C1', icon: '📖' },
-  Geography: { bg: '#E6FFFA', text: '#234E52', icon: '🌍' },
-  'Computer Science': { bg: '#EBF4FF', text: '#2C5282', icon: '💻' },
-  Other: { bg: '#F7FAFC', text: '#4A5568', icon: '📚' },
+// All badges use the same dark surface style — subject is distinguished by a colored dot
+const SUBJECT_DOTS: Record<Subject, string> = {
+  Math: '#0A84FF',
+  Physics: '#64D2FF',
+  Chemistry: '#30D158',
+  Biology: '#34C759',
+  History: '#FF9F0A',
+  Literature: '#BF5AF2',
+  Geography: '#32ADE6',
+  'Computer Science': '#0A84FF',
+  Other: '#8E8E93',
+};
+
+const SUBJECT_ICONS: Record<Subject, string> = {
+  Math: '∑',
+  Physics: '⚛',
+  Chemistry: '⚗',
+  Biology: '🧬',
+  History: '📜',
+  Literature: '📖',
+  Geography: '🌍',
+  'Computer Science': '💻',
+  Other: '📚',
 };
 
 interface Props {
@@ -20,28 +33,20 @@ interface Props {
 }
 
 export default function SubjectBadge({ subject, size = 'md' }: Props) {
-  const colors = SUBJECT_COLORS[subject] ?? SUBJECT_COLORS.Other;
-  const isLarge = size === 'lg';
-  const isSmall = size === 'sm';
+  const dot = SUBJECT_DOTS[subject] ?? '#8E8E93';
+  const icon = SUBJECT_ICONS[subject] ?? '📚';
 
   return (
     <View
       style={[
         styles.badge,
-        { backgroundColor: colors.bg },
-        isLarge && styles.badgeLg,
-        isSmall && styles.badgeSm,
+        size === 'sm' && styles.badgeSm,
+        size === 'lg' && styles.badgeLg,
       ]}
     >
-      <Text style={[styles.icon, isSmall && styles.iconSm]}>{colors.icon}</Text>
-      <Text
-        style={[
-          styles.label,
-          { color: colors.text },
-          isLarge && styles.labelLg,
-          isSmall && styles.labelSm,
-        ]}
-      >
+      <View style={[styles.dot, { backgroundColor: dot }]} />
+      <Text style={[styles.icon, size === 'sm' && styles.iconSm]}>{icon}</Text>
+      <Text style={[styles.label, size === 'sm' && styles.labelSm, size === 'lg' && styles.labelLg]}>
         {subject}
       </Text>
     </View>
@@ -52,34 +57,21 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 20,
     alignSelf: 'flex-start',
-    gap: 4,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
-  badgeLg: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-  },
-  badgeSm: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  icon: {
-    fontSize: 13,
-  },
-  iconSm: {
-    fontSize: 11,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  labelLg: {
-    fontSize: 15,
-  },
-  labelSm: {
-    fontSize: 11,
-  },
+  badgeSm: { paddingHorizontal: 8, paddingVertical: 3 },
+  badgeLg: { paddingHorizontal: 14, paddingVertical: 8 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  icon: { fontSize: 12 },
+  iconSm: { fontSize: 10 },
+  label: { fontSize: 12, fontWeight: '600', color: '#FFFFFF' },
+  labelSm: { fontSize: 11 },
+  labelLg: { fontSize: 15 },
 });

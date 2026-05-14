@@ -11,7 +11,6 @@ import {
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHistory } from '../hooks/useHistory';
 import StepCard from '../components/StepCard';
@@ -21,20 +20,20 @@ import { RootStackParamList } from '../types';
 type RouteT = RouteProp<RootStackParamList, 'Result'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const COLORS = {
-  primary: '#6C63FF',
-  success: '#48BB78',
-  background: '#F8F9FE',
-  text: '#2D3748',
-  textLight: '#718096',
-  white: '#FFFFFF',
-  border: '#E2E8F0',
+const C = {
+  bg: '#0B0B0B',
+  surface: '#1A1A1A',
+  surfaceHigh: '#242424',
+  border: '#2C2C2E',
+  text: '#FFFFFF',
+  textMuted: '#8E8E93',
+  success: '#30D158',
 };
 
-const DIFFICULTY_CONFIG = {
-  Easy: { color: '#48BB78', bg: '#F0FFF4', icon: 'happy-outline' as const },
-  Medium: { color: '#ECC94B', bg: '#FFFFF0', icon: 'remove-circle-outline' as const },
-  Hard: { color: '#FC8181', bg: '#FFF5F5', icon: 'flame-outline' as const },
+const DIFF_CONFIG = {
+  Easy: { color: '#30D158', bg: 'rgba(48,209,88,0.12)', label: 'Easy' },
+  Medium: { color: '#FFD60A', bg: 'rgba(255,214,10,0.12)', label: 'Medium' },
+  Hard: { color: '#FF453A', bg: 'rgba(255,69,58,0.12)', label: 'Hard' },
 };
 
 export default function ResultScreen() {
@@ -44,266 +43,199 @@ export default function ResultScreen() {
   const { saveResult, history } = useHistory();
   const [saved, setSaved] = useState(() => history.some((h) => h.id === result.id));
 
-  const diffConfig = DIFFICULTY_CONFIG[result.difficulty];
+  const diff = DIFF_CONFIG[result.difficulty];
 
   const handleSave = async () => {
     if (saved) return;
     await saveResult(result);
     setSaved(true);
-    Alert.alert('Saved!', 'This solution has been added to your history.');
+    Alert.alert('Saved', 'Added to your history.');
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Image + badges row */}
-        <View style={styles.imageRow}>
+
+        {/* Image + meta */}
+        <View style={styles.hero}>
           <Image source={{ uri: result.imageUri }} style={styles.thumbnail} resizeMode="cover" />
-          <View style={styles.badgesCol}>
+          <View style={styles.metaCol}>
             <SubjectBadge subject={result.subject} size="md" />
-            <View style={[styles.diffBadge, { backgroundColor: diffConfig.bg }]}>
-              <Ionicons name={diffConfig.icon} size={14} color={diffConfig.color} />
-              <Text style={[styles.diffText, { color: diffConfig.color }]}>
-                {result.difficulty}
-              </Text>
+            <View style={[styles.diffBadge, { backgroundColor: diff.bg }]}>
+              <View style={[styles.diffDot, { backgroundColor: diff.color }]} />
+              <Text style={[styles.diffText, { color: diff.color }]}>{diff.label}</Text>
             </View>
-            <View style={styles.stepCountBadge}>
-              <Ionicons name="list-outline" size={14} color={COLORS.primary} />
-              <Text style={styles.stepCountText}>{result.steps.length} steps</Text>
+            <View style={styles.stepsBadge}>
+              <Text style={styles.stepsText}>{result.steps.length} steps</Text>
             </View>
           </View>
         </View>
 
         {/* Question */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Question</Text>
-          <View style={styles.questionCard}>
+          <Text style={styles.label}>Question</Text>
+          <View style={styles.card}>
             <Text style={styles.questionText}>{result.question}</Text>
           </View>
         </View>
 
         {/* Answer */}
-        <LinearGradient
-          colors={['#6C63FF', '#9F97FF']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.answerGradient}
-        >
-          <View style={styles.answerHeader}>
-            <Ionicons name="checkmark-circle" size={22} color={COLORS.white} />
-            <Text style={styles.answerLabel}>Answer</Text>
+        <View style={styles.section}>
+          <Text style={styles.label}>Answer</Text>
+          <View style={styles.answerCard}>
+            <View style={styles.answerRow}>
+              <Ionicons name="checkmark-circle" size={20} color={C.success} />
+              <Text style={styles.answerText}>{result.answer}</Text>
+            </View>
           </View>
-          <Text style={styles.answerText}>{result.answer}</Text>
-        </LinearGradient>
+        </View>
 
         {/* Steps */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Step-by-Step Solution</Text>
-          <View style={styles.stepsContainer}>
-            {result.steps.map((step, index) => (
-              <StepCard key={step.stepNumber} step={step} isLast={index === result.steps.length - 1} />
-            ))}
-          </View>
+          <Text style={styles.label}>Step-by-Step</Text>
+          {result.steps.map((step, i) => (
+            <StepCard key={step.stepNumber} step={step} isLast={i === result.steps.length - 1} />
+          ))}
         </View>
 
         {/* Actions */}
         <View style={styles.actions}>
           {!saved ? (
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Ionicons name="bookmark-outline" size={20} color={COLORS.white} />
+              <Ionicons name="bookmark-outline" size={18} color="#000" />
               <Text style={styles.saveBtnText}>Save to History</Text>
             </TouchableOpacity>
           ) : (
-            <View style={styles.savedIndicator}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+            <View style={styles.savedRow}>
+              <Ionicons name="checkmark-circle" size={18} color={C.success} />
               <Text style={styles.savedText}>Saved to History</Text>
             </View>
           )}
 
-          <TouchableOpacity
-            style={styles.scanAgainBtn}
-            onPress={() => navigation.replace('Scan')}
-          >
-            <Ionicons name="camera-outline" size={20} color={COLORS.primary} />
+          <TouchableOpacity style={styles.scanAgainBtn} onPress={() => navigation.replace('Scan')}>
+            <Ionicons name="camera-outline" size={18} color={C.text} />
             <Text style={styles.scanAgainText}>Scan Another</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.bottomPad} />
+        <View style={{ height: 32 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scroll: {
-    flex: 1,
-  },
-  imageRow: {
+  safeArea: { flex: 1, backgroundColor: C.bg },
+  scroll: { flex: 1 },
+
+  hero: {
     flexDirection: 'row',
     padding: 16,
     gap: 14,
     alignItems: 'flex-start',
   },
   thumbnail: {
-    width: 110,
-    height: 110,
-    borderRadius: 14,
-    backgroundColor: '#EEF0F5',
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    backgroundColor: C.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: C.border,
   },
-  badgesCol: {
-    flex: 1,
-    gap: 8,
-    paddingTop: 4,
-  },
+  metaCol: { flex: 1, gap: 8, paddingTop: 4 },
   diffBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
     alignSelf: 'flex-start',
   },
-  diffText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  stepCountBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
+  diffDot: { width: 7, height: 7, borderRadius: 4 },
+  diffText: { fontSize: 12, fontWeight: '700' },
+  stepsBadge: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
-    backgroundColor: 'rgba(108, 99, 255, 0.08)',
+    backgroundColor: C.surface,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  stepCountText: {
-    fontSize: 12,
+  stepsText: { fontSize: 12, fontWeight: '600', color: C.textMuted },
+
+  section: { paddingHorizontal: 16, marginBottom: 20 },
+  label: {
+    fontSize: 11,
     fontWeight: '700',
-    color: COLORS.primary,
-  },
-  section: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textLight,
+    color: C.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     marginBottom: 10,
   },
-  questionCard: {
-    backgroundColor: COLORS.white,
+  card: {
+    backgroundColor: C.surface,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    borderColor: C.border,
   },
   questionText: {
-    fontSize: 16,
-    color: COLORS.text,
-    lineHeight: 24,
+    fontSize: 15,
+    color: C.text,
+    lineHeight: 23,
     fontWeight: '500',
   },
-  answerGradient: {
-    marginHorizontal: 16,
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 20,
+  answerCard: {
+    backgroundColor: C.surface,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#2A3D2A',
   },
-  answerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  answerLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.85)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
+  answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   answerText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: COLORS.white,
-    lineHeight: 26,
+    flex: 1,
+    fontSize: 17,
+    fontWeight: '700',
+    color: C.text,
+    lineHeight: 25,
   },
-  stepsContainer: {
-    gap: 0,
-  },
-  actions: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
+
+  actions: { paddingHorizontal: 16, gap: 10 },
   saveBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: C.text,
     borderRadius: 14,
     paddingVertical: 15,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
   },
-  saveBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  savedIndicator: {
+  saveBtnText: { fontSize: 15, fontWeight: '700', color: '#000' },
+  savedRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#F0FFF4',
+    backgroundColor: 'rgba(48,209,88,0.1)',
     borderRadius: 14,
     paddingVertical: 15,
     borderWidth: 1,
-    borderColor: '#9AE6B4',
+    borderColor: 'rgba(48,209,88,0.25)',
   },
-  savedText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.success,
-  },
+  savedText: { fontSize: 15, fontWeight: '700', color: C.success },
   scanAgainBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: COLORS.white,
+    backgroundColor: C.surface,
     borderRadius: 14,
     paddingVertical: 15,
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  scanAgainText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  bottomPad: {
-    height: 32,
-  },
+  scanAgainText: { fontSize: 15, fontWeight: '700', color: C.text },
 });

@@ -20,12 +20,18 @@ import { RootStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const COLORS = {
-  primary: '#6C63FF',
-  white: '#FFFFFF',
-  overlay: 'rgba(0,0,0,0.55)',
-  danger: '#FC8181',
+const C = {
+  bg: '#0B0B0B',
+  surface: '#1A1A1A',
+  border: '#2C2C2E',
+  text: '#FFFFFF',
+  textMuted: '#8E8E93',
+  overlay: 'rgba(0,0,0,0.72)',
 };
+
+const VIEWFINDER = 280;
+const CORNER = 26;
+const THICK = 3;
 
 export default function ScanScreen() {
   const navigation = useNavigation<Nav>();
@@ -83,46 +89,52 @@ export default function ScanScreen() {
     }
   }, [processImage]);
 
-  // Web platform: only gallery
+  // Web: gallery only
   if (Platform.OS === 'web') {
     return (
-      <SafeAreaView style={styles.webContainer}>
-        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={COLORS.white} />
+      <View style={styles.webContainer}>
+        <TouchableOpacity style={styles.webClose} onPress={() => navigation.goBack()}>
+          <Ionicons name="close" size={26} color={C.text} />
         </TouchableOpacity>
-        <Text style={styles.webTitle}>Upload Homework Image</Text>
-        <Text style={styles.webSubtitle}>Camera scanning is available on mobile devices</Text>
-        <TouchableOpacity style={styles.webGalleryBtn} onPress={handlePickFromGallery}>
-          <Ionicons name="images" size={28} color={COLORS.white} />
-          <Text style={styles.webGalleryText}>Choose Image</Text>
+        <View style={styles.webBrackets}>
+          <View style={[styles.wCorner, styles.wTL]} />
+          <View style={[styles.wCorner, styles.wTR]} />
+          <View style={[styles.wCorner, styles.wBL]} />
+          <View style={[styles.wCorner, styles.wBR]} />
+        </View>
+        <Text style={styles.webTitle}>Upload Problem</Text>
+        <Text style={styles.webSub}>Camera scanning available on mobile</Text>
+        <TouchableOpacity style={styles.webBtn} onPress={handlePickFromGallery}>
+          <Ionicons name="images-outline" size={22} color={C.text} />
+          <Text style={styles.webBtnText}>Choose Image</Text>
         </TouchableOpacity>
         {analyzing && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.analyzingText}>Analyzing with Claude AI...</Text>
+          <View style={styles.webAnalyzing}>
+            <ActivityIndicator size="large" color={C.text} />
+            <Text style={styles.webAnalyzingText}>Analyzing with Claude AI…</Text>
           </View>
         )}
-      </SafeAreaView>
+      </View>
     );
   }
 
-  if (!permission) {
-    return <View style={styles.container} />;
-  }
+  if (!permission) return <View style={styles.container} />;
 
   if (!permission.granted) {
     return (
-      <View style={styles.permissionContainer}>
-        <Ionicons name="camera-outline" size={64} color={COLORS.primary} />
-        <Text style={styles.permissionTitle}>Camera Access Needed</Text>
-        <Text style={styles.permissionText}>
-          Tutorly needs your camera to scan homework problems
+      <View style={styles.permContainer}>
+        <View style={styles.permIcon}>
+          <Ionicons name="camera-outline" size={40} color={C.text} />
+        </View>
+        <Text style={styles.permTitle}>Camera Access Needed</Text>
+        <Text style={styles.permText}>
+          Tutorly needs camera access to scan homework problems
         </Text>
-        <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
-          <Text style={styles.permissionBtnText}>Grant Permission</Text>
+        <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
+          <Text style={styles.permBtnText}>Grant Permission</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.galleryFallback} onPress={handlePickFromGallery}>
-          <Text style={styles.galleryFallbackText}>Or pick from gallery</Text>
+        <TouchableOpacity onPress={handlePickFromGallery} style={{ marginTop: 12 }}>
+          <Text style={styles.permGallery}>Or pick from gallery</Text>
         </TouchableOpacity>
       </View>
     );
@@ -132,48 +144,52 @@ export default function ScanScreen() {
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing="back" />
 
-      {/* Dim overlay with viewfinder cutout effect */}
+      {/* Scrim overlay */}
       <View style={styles.overlay}>
         <View style={styles.overlayTop} />
-        <View style={styles.overlayMiddleRow}>
+        <View style={styles.overlayRow}>
           <View style={styles.overlaySide} />
+          {/* Viewfinder — transparent cutout with corner brackets */}
           <View style={styles.viewfinder}>
-            <View style={[styles.corner, styles.cornerTL]} />
-            <View style={[styles.corner, styles.cornerTR]} />
-            <View style={[styles.corner, styles.cornerBL]} />
-            <View style={[styles.corner, styles.cornerBR]} />
+            <View style={[styles.corner, styles.cTL]} />
+            <View style={[styles.corner, styles.cTR]} />
+            <View style={[styles.corner, styles.cBL]} />
+            <View style={[styles.corner, styles.cBR]} />
+            <Text style={styles.hint}>Align problem in frame</Text>
           </View>
           <View style={styles.overlaySide} />
         </View>
         <View style={styles.overlayBottom} />
       </View>
 
-      {/* Top controls */}
+      {/* Top bar */}
       <SafeAreaView style={styles.topBar} edges={['top']}>
         <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={26} color={COLORS.white} />
+          <Ionicons name="close" size={24} color={C.text} />
         </TouchableOpacity>
-        <Text style={styles.scanLabel}>Align problem in frame</Text>
-        <View style={{ width: 44 }} />
+        <Text style={styles.topLabel}>Tutorly</Text>
+        <View style={{ width: 40 }} />
       </SafeAreaView>
 
       {/* Bottom controls */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.iconBtn} onPress={handlePickFromGallery}>
-          <Ionicons name="images-outline" size={26} color={COLORS.white} />
-          <Text style={styles.btnLabel}>Gallery</Text>
+        <TouchableOpacity style={styles.sideBtn} onPress={handlePickFromGallery}>
+          <Ionicons name="images-outline" size={24} color={C.text} />
+          <Text style={styles.sideBtnLabel}>Gallery</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.captureBtn}
           onPress={handleCapture}
           disabled={analyzing}
-          activeOpacity={0.8}
+          activeOpacity={0.75}
         >
-          <View style={styles.captureInner} />
+          <View style={styles.captureRing}>
+            <View style={styles.captureDot} />
+          </View>
         </TouchableOpacity>
 
-        <View style={{ width: 64 }} />
+        <View style={{ width: 56 }} />
       </View>
 
       {/* Analyzing overlay */}
@@ -183,9 +199,9 @@ export default function ScanScreen() {
             <Image source={{ uri: capturedUri }} style={styles.capturedPreview} resizeMode="cover" />
           )}
           <View style={styles.analyzingCard}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.analyzingTitle}>Analyzing...</Text>
-            <Text style={styles.analyzingSubtext}>Claude AI is solving your problem</Text>
+            <ActivityIndicator size="large" color={C.text} />
+            <Text style={styles.analyzingTitle}>Analyzing…</Text>
+            <Text style={styles.analyzingText}>Claude AI is solving your problem</Text>
           </View>
         </View>
       )}
@@ -193,152 +209,112 @@ export default function ScanScreen() {
   );
 }
 
-const VIEWFINDER_SIZE = 280;
-const CORNER_SIZE = 24;
-const CORNER_THICKNESS = 3;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
+  container: { flex: 1, backgroundColor: '#000' },
+
+  // Web
   webContainer: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: C.bg,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
-  webTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginTop: 20,
+  webClose: { position: 'absolute', top: 56, left: 20 },
+  webBrackets: {
+    width: 160,
+    height: 160,
+    marginBottom: 32,
+    position: 'relative',
   },
-  webSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
-    marginTop: 8,
-    textAlign: 'center',
+  wCorner: {
+    position: 'absolute',
+    width: 28,
+    height: 28,
+    borderColor: C.text,
   },
-  webGalleryBtn: {
+  wTL: { top: 0, left: 0, borderTopWidth: 3, borderLeftWidth: 3 },
+  wTR: { top: 0, right: 0, borderTopWidth: 3, borderRightWidth: 3 },
+  wBL: { bottom: 0, left: 0, borderBottomWidth: 3, borderLeftWidth: 3 },
+  wBR: { bottom: 0, right: 0, borderBottomWidth: 3, borderRightWidth: 3 },
+  webTitle: { fontSize: 22, fontWeight: '700', color: C.text, marginBottom: 8 },
+  webSub: { fontSize: 13, color: C.textMuted, textAlign: 'center', marginBottom: 32 },
+  webBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    marginTop: 32,
+    gap: 10,
+    backgroundColor: C.surface,
+    borderRadius: 14,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  webGalleryText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-  },
-  permissionContainer: {
+  webBtnText: { fontSize: 16, fontWeight: '600', color: C.text },
+  webAnalyzing: { marginTop: 32, alignItems: 'center', gap: 12 },
+  webAnalyzingText: { fontSize: 15, color: C.textMuted },
+
+  // Permission
+  permContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: C.bg,
     gap: 12,
   },
-  permissionTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#2D3748',
-    marginTop: 8,
+  permIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: C.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: C.border,
+    marginBottom: 8,
   },
-  permissionText: {
-    fontSize: 15,
-    color: '#718096',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  permissionBtn: {
-    backgroundColor: COLORS.primary,
+  permTitle: { fontSize: 20, fontWeight: '700', color: C.text },
+  permText: { fontSize: 14, color: C.textMuted, textAlign: 'center', lineHeight: 21 },
+  permBtn: {
+    backgroundColor: C.text,
     borderRadius: 14,
     paddingHorizontal: 32,
     paddingVertical: 14,
-    marginTop: 12,
-  },
-  permissionBtnText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  galleryFallback: {
     marginTop: 8,
   },
-  galleryFallbackText: {
-    color: COLORS.primary,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'stretch',
-  },
-  overlayTop: {
-    flex: 1,
-    backgroundColor: COLORS.overlay,
-  },
-  overlayMiddleRow: {
-    flexDirection: 'row',
-    height: VIEWFINDER_SIZE,
-  },
-  overlaySide: {
-    flex: 1,
-    backgroundColor: COLORS.overlay,
-  },
-  overlayBottom: {
-    flex: 1.5,
-    backgroundColor: COLORS.overlay,
-  },
-  viewfinder: {
-    width: VIEWFINDER_SIZE,
-    height: VIEWFINDER_SIZE,
-  },
+  permBtnText: { color: '#000', fontSize: 15, fontWeight: '700' },
+  permGallery: { color: C.textMuted, fontSize: 14, fontWeight: '600' },
+
+  // Camera overlay
+  overlay: { ...StyleSheet.absoluteFillObject },
+  overlayTop: { flex: 1, backgroundColor: C.overlay },
+  overlayRow: { flexDirection: 'row', height: VIEWFINDER },
+  overlaySide: { flex: 1, backgroundColor: C.overlay },
+  overlayBottom: { flex: 1.4, backgroundColor: C.overlay },
+  viewfinder: { width: VIEWFINDER, height: VIEWFINDER },
   corner: {
     position: 'absolute',
-    width: CORNER_SIZE,
-    height: CORNER_SIZE,
-    borderColor: COLORS.white,
+    width: CORNER,
+    height: CORNER,
+    borderColor: '#FFFFFF',
   },
-  cornerTL: {
-    top: 0,
+  cTL: { top: 0, left: 0, borderTopWidth: THICK, borderLeftWidth: THICK, borderTopLeftRadius: 3 },
+  cTR: { top: 0, right: 0, borderTopWidth: THICK, borderRightWidth: THICK, borderTopRightRadius: 3 },
+  cBL: { bottom: 0, left: 0, borderBottomWidth: THICK, borderLeftWidth: THICK, borderBottomLeftRadius: 3 },
+  cBR: { bottom: 0, right: 0, borderBottomWidth: THICK, borderRightWidth: THICK, borderBottomRightRadius: 3 },
+  hint: {
+    position: 'absolute',
+    bottom: -28,
     left: 0,
-    borderTopWidth: CORNER_THICKNESS,
-    borderLeftWidth: CORNER_THICKNESS,
-    borderTopLeftRadius: 4,
-  },
-  cornerTR: {
-    top: 0,
     right: 0,
-    borderTopWidth: CORNER_THICKNESS,
-    borderRightWidth: CORNER_THICKNESS,
-    borderTopRightRadius: 4,
+    textAlign: 'center',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    fontWeight: '500',
   },
-  cornerBL: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: CORNER_THICKNESS,
-    borderLeftWidth: CORNER_THICKNESS,
-    borderBottomLeftRadius: 4,
-  },
-  cornerBR: {
-    bottom: 0,
-    right: 0,
-    borderBottomWidth: CORNER_THICKNESS,
-    borderRightWidth: CORNER_THICKNESS,
-    borderBottomRightRadius: 4,
-  },
+
+  // Top bar
   topBar: {
     position: 'absolute',
     top: 0,
@@ -348,13 +324,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingBottom: 8,
   },
-  scanLabel: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '600',
+  iconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  topLabel: { color: C.text, fontSize: 16, fontWeight: '700' },
+
+  // Bottom controls
   bottomBar: {
     position: 'absolute',
     bottom: 0,
@@ -363,80 +345,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 32,
-    paddingBottom: 48,
-    paddingTop: 24,
+    paddingHorizontal: 36,
+    paddingBottom: 52,
+    paddingTop: 20,
   },
-  iconBtn: {
-    width: 56,
-    alignItems: 'center',
-    gap: 4,
-  },
-  btnLabel: {
-    color: COLORS.white,
-    fontSize: 11,
-    fontWeight: '600',
-  },
+  sideBtn: { width: 56, alignItems: 'center', gap: 5 },
+  sideBtnLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '600' },
   captureBtn: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 4,
-    borderColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  captureInner: {
+  captureRing: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  captureDot: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: COLORS.white,
+    backgroundColor: '#FFFFFF',
   },
+
+  // Analyzing
   analyzingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
   capturedPreview: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     borderRadius: 16,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   analyzingCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: C.surface,
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     width: '100%',
     gap: 10,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  analyzingTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#2D3748',
-  },
-  analyzingSubtext: {
-    fontSize: 14,
-    color: '#718096',
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 24,
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-  },
-  analyzingText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2D3748',
-  },
+  analyzingTitle: { fontSize: 18, fontWeight: '700', color: C.text },
+  analyzingText: { fontSize: 13, color: C.textMuted },
 });
