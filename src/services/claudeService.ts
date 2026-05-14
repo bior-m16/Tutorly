@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 import { HomeworkResult, Step, Subject, Difficulty } from '../types';
 
 const getClient = () =>
@@ -43,38 +43,57 @@ interface ClaudeResponse {
   steps: Step[];
 }
 
-async function imageUriToBase64(uri: string): Promise<{ base64: string; mediaType: string }> {
-  const base64 = await FileSystem.readAsStringAsync(uri, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
-
-  const extension = uri.split('.').pop()?.toLowerCase() ?? 'jpg';
-  const mediaTypeMap: Record<string, string> = {
+function getMimeType(uri: string): string {
+  const ext = uri.split('?')[0].split('.').pop()?.toLowerCase() ?? '';
+  const map: Record<string, string> = {
     jpg: 'image/jpeg',
     jpeg: 'image/jpeg',
     png: 'image/png',
     gif: 'image/gif',
     webp: 'image/webp',
   };
+  return map[ext] ?? 'image/jpeg';
+}
 
-  return {
-    base64,
-    mediaType: mediaTypeMap[extension] ?? 'image/jpeg',
-  };
+async function imageUriToBase64(uri: string): Promise<{ base64: string; mediaType: string }> {
+  if (Platform.OS === 'web') {
+    // On web, URIs from expo-image-picker are blob: or data: URLs
+    if (uri.startsWith('data:')) {
+      const [header, base64] = uri.split(',');
+      const mediaType = header.replace('data:', '').replace(';base64', '');
+      return { base64, mediaType };
+    }
+    // blob: URL — fetch and convert via FileReader
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const mediaType = blob.type || 'image/jpeg';
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(',')[1] ?? '';
+        resolve({ base64, mediaType });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  // Native path — expo-file-system is only imported here so it never loads on web
+  const FileSystem = await import('expo-file-system');
+  const base64 = await FileSystem.readAsStringAsync(uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  return { base64, mediaType: getMimeType(uri) };
 }
 
 function parseClaudeResponse(text: string): ClaudeResponse {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error('No JSON found in response');
-  }
-
+  if (!jsonMatch) throw new Error('No JSON found in response');
   const parsed = JSON.parse(jsonMatch[0]) as ClaudeResponse;
-
   if (!parsed.subject || !parsed.question || !parsed.answer || !parsed.steps) {
     throw new Error('Invalid response structure from Claude');
   }
-
   return parsed;
 }
 

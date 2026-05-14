@@ -9,7 +9,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, CameraViewRef, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -32,7 +32,7 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [analyzing, setAnalyzing] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const cameraRef = useRef<CameraView>(null);
+  const cameraRef = useRef<CameraViewRef>(null);
 
   const processImage = useCallback(
     async (uri: string) => {
@@ -57,7 +57,7 @@ export default function ScanScreen() {
   const handleCapture = useCallback(async () => {
     if (!cameraRef.current) return;
     try {
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.85, base64: false });
+      const photo = await cameraRef.current.takePicture({ quality: 0.85 });
       if (photo?.uri) {
         setCapturedUri(photo.uri);
         await processImage(photo.uri);
