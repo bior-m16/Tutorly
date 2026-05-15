@@ -20,20 +20,10 @@ import { RootStackParamList } from '../types';
 type RouteT = RouteProp<RootStackParamList, 'Result'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const C = {
-  bg: '#0B0B0B',
-  surface: '#1A1A1A',
-  surfaceHigh: '#242424',
-  border: '#2C2C2E',
-  text: '#FFFFFF',
-  textMuted: '#8E8E93',
-  success: '#30D158',
-};
-
 const DIFF_CONFIG = {
-  Easy: { color: '#30D158', bg: 'rgba(48,209,88,0.12)', label: 'Easy' },
-  Medium: { color: '#FFD60A', bg: 'rgba(255,214,10,0.12)', label: 'Medium' },
-  Hard: { color: '#FF453A', bg: 'rgba(255,69,58,0.12)', label: 'Hard' },
+  Easy:   { color: '#34C759', bg: 'rgba(52,199,89,0.1)' },
+  Medium: { color: '#FF9F0A', bg: 'rgba(255,159,10,0.1)' },
+  Hard:   { color: '#FF3B30', bg: 'rgba(255,59,48,0.1)' },
 };
 
 export default function ResultScreen() {
@@ -63,7 +53,7 @@ export default function ResultScreen() {
             <SubjectBadge subject={result.subject} size="md" />
             <View style={[styles.diffBadge, { backgroundColor: diff.bg }]}>
               <View style={[styles.diffDot, { backgroundColor: diff.color }]} />
-              <Text style={[styles.diffText, { color: diff.color }]}>{diff.label}</Text>
+              <Text style={[styles.diffText, { color: diff.color }]}>{result.difficulty}</Text>
             </View>
             <View style={styles.stepsBadge}>
               <Text style={styles.stepsText}>{result.steps.length} steps</Text>
@@ -83,10 +73,8 @@ export default function ResultScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Answer</Text>
           <View style={styles.answerCard}>
-            <View style={styles.answerRow}>
-              <Ionicons name="checkmark-circle" size={20} color={C.success} />
-              <Text style={styles.answerText}>{result.answer}</Text>
-            </View>
+            <Ionicons name="checkmark-circle-outline" size={20} color="#34C759" style={{ marginTop: 2 }} />
+            <Text style={styles.answerText}>{result.answer}</Text>
           </View>
         </View>
 
@@ -94,26 +82,29 @@ export default function ResultScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Step-by-Step</Text>
           {result.steps.map((step, i) => (
-            <StepCard key={step.stepNumber} step={step} isLast={i === result.steps.length - 1} />
+            <StepCard
+              key={step.stepNumber}
+              step={step}
+              isLast={i === result.steps.length - 1}
+            />
           ))}
         </View>
 
         {/* Actions */}
         <View style={styles.actions}>
           {!saved ? (
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Ionicons name="bookmark-outline" size={18} color="#000" />
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave} activeOpacity={0.7}>
+              <Ionicons name="bookmark-outline" size={18} color="#FFF" />
               <Text style={styles.saveBtnText}>Save to History</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.savedRow}>
-              <Ionicons name="checkmark-circle" size={18} color={C.success} />
+              <Ionicons name="checkmark-circle" size={18} color="#34C759" />
               <Text style={styles.savedText}>Saved to History</Text>
             </View>
           )}
-
-          <TouchableOpacity style={styles.scanAgainBtn} onPress={() => navigation.replace('Scan')}>
-            <Ionicons name="camera-outline" size={18} color={C.text} />
+          <TouchableOpacity style={styles.scanAgainBtn} onPress={() => navigation.replace('Scan')} activeOpacity={0.7}>
+            <Ionicons name="camera-outline" size={18} color="#1C1C1E" />
             <Text style={styles.scanAgainText}>Scan Another</Text>
           </TouchableOpacity>
         </View>
@@ -125,117 +116,67 @@ export default function ResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: C.bg },
+  safeArea: { flex: 1, backgroundColor: '#EFEFEF' },
   scroll: { flex: 1 },
 
-  hero: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 14,
-    alignItems: 'flex-start',
-  },
+  hero: { flexDirection: 'row', padding: 16, gap: 14, alignItems: 'flex-start' },
   thumbnail: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
-    backgroundColor: C.surface,
-    borderWidth: 1,
-    borderColor: C.border,
+    width: 100, height: 100, borderRadius: 14,
+    backgroundColor: '#E0E0E5',
   },
   metaCol: { flex: 1, gap: 8, paddingTop: 4 },
   diffBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 20, alignSelf: 'flex-start',
   },
   diffDot: { width: 7, height: 7, borderRadius: 4 },
   diffText: { fontSize: 12, fontWeight: '700' },
   stepsBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    backgroundColor: C.surface,
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: C.border,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
+    backgroundColor: '#EFEFEF', alignSelf: 'flex-start',
   },
-  stepsText: { fontSize: 12, fontWeight: '600', color: C.textMuted },
+  stepsText: { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
 
   section: { paddingHorizontal: 16, marginBottom: 20 },
   label: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: C.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 10,
+    fontSize: 11, fontWeight: '700', color: '#AEAEB2',
+    textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
   },
   card: {
-    backgroundColor: C.surface,
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: C.border,
+    backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
-  questionText: {
-    fontSize: 15,
-    color: C.text,
-    lineHeight: 23,
-    fontWeight: '500',
-  },
+  questionText: { fontSize: 15, color: '#1C1C1E', lineHeight: 23, fontWeight: '500' },
+
   answerCard: {
-    backgroundColor: C.surface,
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#2A3D2A',
+    backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16,
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    borderLeftWidth: 3, borderLeftColor: '#34C759',
   },
-  answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  answerText: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '700',
-    color: C.text,
-    lineHeight: 25,
-  },
+  answerText: { flex: 1, fontSize: 17, fontWeight: '700', color: '#1C1C1E', lineHeight: 25 },
 
   actions: { paddingHorizontal: 16, gap: 10 },
   saveBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: C.text,
-    borderRadius: 14,
-    paddingVertical: 15,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, backgroundColor: '#1C1C1E', borderRadius: 16, paddingVertical: 15,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12, shadowRadius: 8, elevation: 3,
   },
-  saveBtnText: { fontSize: 15, fontWeight: '700', color: '#000' },
+  saveBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
   savedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(48,209,88,0.1)',
-    borderRadius: 14,
-    paddingVertical: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(48,209,88,0.25)',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    backgroundColor: 'rgba(52,199,89,0.1)', borderRadius: 16, paddingVertical: 15,
   },
-  savedText: { fontSize: 15, fontWeight: '700', color: C.success },
+  savedText: { fontSize: 15, fontWeight: '700', color: '#34C759' },
   scanAgainBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: C.surface,
-    borderRadius: 14,
-    paddingVertical: 15,
-    borderWidth: 1,
-    borderColor: C.border,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, backgroundColor: '#FFFFFF', borderRadius: 16, paddingVertical: 15,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
-  scanAgainText: { fontSize: 15, fontWeight: '700', color: C.text },
+  scanAgainText: { fontSize: 15, fontWeight: '700', color: '#1C1C1E' },
 });

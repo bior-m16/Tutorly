@@ -18,25 +18,42 @@ import { RootStackParamList, Subject } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const SUBJECTS: { label: Subject; icon: string }[] = [
-  { label: 'Math', icon: '∑' },
-  { label: 'Physics', icon: '⚛' },
-  { label: 'Chemistry', icon: '⚗' },
-  { label: 'Biology', icon: '🧬' },
-  { label: 'History', icon: '📜' },
-  { label: 'Literature', icon: '📖' },
+const SUBJECTS: { label: Subject; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { label: 'Math', icon: 'calculator-outline' },
+  { label: 'Physics', icon: 'planet-outline' },
+  { label: 'Chemistry', icon: 'flask-outline' },
+  { label: 'Biology', icon: 'leaf-outline' },
+  { label: 'History', icon: 'library-outline' },
+  { label: 'Literature', icon: 'book-outline' },
 ];
 
-const C = {
-  bg: '#0B0B0B',
-  surface: '#1A1A1A',
-  surfaceHigh: '#242424',
-  border: '#2C2C2E',
-  text: '#FFFFFF',
-  textMuted: '#8E8E93',
-  textDim: '#48484A',
-  accent: '#FFFFFF',
-  accentDim: 'rgba(255,255,255,0.08)',
+export const C = {
+  bg: '#EFEFEF',
+  surface: '#FFFFFF',
+  surfacePressed: '#F5F5F5',
+  border: 'rgba(0,0,0,0.06)',
+  text: '#1C1C1E',
+  textSub: '#6C6C70',
+  textMuted: '#AEAEB2',
+  accent: '#1C1C1E',
+  shadow: '#000',
+};
+
+export const shadow = {
+  card: {
+    shadowColor: C.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+    elevation: 4,
+  },
+  btn: {
+    shadowColor: C.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
 };
 
 export default function HomeScreen() {
@@ -53,7 +70,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
+      <StatusBar barStyle="dark-content" backgroundColor={C.bg} />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Header */}
@@ -62,25 +79,26 @@ export default function HomeScreen() {
             <Text style={styles.brandName}>Tutorly</Text>
             <Text style={styles.tagline}>AI Homework Helper</Text>
           </View>
-          <View style={styles.statsBubble}>
+          <View style={[styles.statsBubble, shadow.btn]}>
             <Text style={styles.statsNumber}>{history.length}</Text>
-            <Text style={styles.statsLabel}>solved</Text>
+            <Text style={styles.statsLabel}>Solved</Text>
           </View>
         </View>
 
         {/* Scan card */}
-        <View style={styles.scanCard}>
+        <View style={[styles.scanCard, shadow.card]}>
           <ScanButton onPress={() => navigation.navigate('Scan')} size={80} />
           <Text style={styles.scanTitle}>Scan a Problem</Text>
           <Text style={styles.scanSubtitle}>
-            Point your camera at any homework question for instant step-by-step help
+            Point your camera at any homework question{'\n'}for instant step-by-step help
           </Text>
           <View style={styles.divider} />
           <TouchableOpacity
-            style={styles.galleryBtn}
+            style={[styles.galleryBtn, shadow.btn]}
             onPress={() => navigation.navigate('Scan')}
+            activeOpacity={0.7}
           >
-            <Ionicons name="images-outline" size={17} color={C.textMuted} />
+            <Ionicons name="images-outline" size={20} color={C.textSub} />
             <Text style={styles.galleryBtnText}>Choose from Gallery</Text>
           </TouchableOpacity>
         </View>
@@ -92,11 +110,11 @@ export default function HomeScreen() {
             {SUBJECTS.map((s) => (
               <TouchableOpacity
                 key={s.label}
-                style={styles.chip}
+                style={[styles.chip, shadow.btn]}
                 onPress={() => navigation.navigate('Scan')}
-                activeOpacity={0.6}
+                activeOpacity={0.7}
               >
-                <Text style={styles.chipIcon}>{s.icon}</Text>
+                <Ionicons name={s.icon} size={15} color={C.textSub} />
                 <Text style={styles.chipLabel}>{s.label}</Text>
               </TouchableOpacity>
             ))}
@@ -123,7 +141,7 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <View style={styles.bottomPad} />
+        <View style={{ height: 32 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -132,93 +150,93 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: C.bg },
   scroll: { flex: 1, backgroundColor: C.bg },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingTop: 18,
+    paddingBottom: 22,
   },
   brandName: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '800',
     color: C.text,
     letterSpacing: -0.5,
   },
   tagline: {
     fontSize: 13,
-    color: C.textMuted,
+    color: C.textSub,
     marginTop: 2,
+    fontWeight: '500',
   },
   statsBubble: {
     backgroundColor: C.surface,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: C.border,
   },
   statsNumber: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
     color: C.text,
   },
   statsLabel: {
     fontSize: 11,
-    color: C.textMuted,
+    color: C.textSub,
     fontWeight: '600',
+    marginTop: 1,
   },
+
   scanCard: {
     marginHorizontal: 16,
     backgroundColor: C.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 28,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: C.border,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   scanTitle: {
-    fontSize: 19,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: C.text,
     marginTop: 18,
+    letterSpacing: -0.3,
   },
   scanSubtitle: {
-    fontSize: 13,
-    color: C.textMuted,
+    fontSize: 14,
+    color: C.textSub,
     marginTop: 6,
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 20,
+    fontWeight: '400',
   },
   divider: {
     height: 1,
     backgroundColor: C.border,
     width: '100%',
-    marginVertical: 18,
+    marginVertical: 20,
   },
   galleryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    backgroundColor: C.surfaceHigh,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: C.border,
+    gap: 10,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    backgroundColor: C.bg,
+    borderRadius: 18,
+    width: '100%',
+    justifyContent: 'center',
   },
   galleryBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: C.textMuted,
+    color: C.textSub,
   },
-  section: {
-    paddingHorizontal: 16,
-    marginBottom: 24,
-  },
+
+  section: { paddingHorizontal: 16, marginBottom: 24 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -226,33 +244,27 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: C.text,
     marginBottom: 12,
+    letterSpacing: -0.2,
   },
-  seeAll: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: C.textMuted,
-  },
+  seeAll: { fontSize: 14, fontWeight: '600', color: C.textSub },
+
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 7,
     backgroundColor: C.surface,
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     marginRight: 8,
-    borderWidth: 1,
-    borderColor: C.border,
   },
-  chipIcon: { fontSize: 13 },
   chipLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: C.textMuted,
+    color: C.textSub,
   },
-  bottomPad: { height: 32 },
 });

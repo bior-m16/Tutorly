@@ -18,32 +18,25 @@ import { HomeworkResult, RootStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const C = {
-  bg: '#0B0B0B',
-  surface: '#1A1A1A',
-  border: '#2C2C2E',
-  text: '#FFFFFF',
-  textMuted: '#8E8E93',
-  danger: '#FF453A',
-};
+const CORNER = 22;
+const THICK = 2;
 
 function EmptyState({ onScan }: { onScan: () => void }) {
   return (
     <View style={styles.emptyContainer}>
-      {/* Scanner bracket decoration */}
-      <View style={styles.emptyBrackets}>
+      <View style={styles.emptyBracketBox}>
         <View style={[styles.eBracket, styles.eTL]} />
         <View style={[styles.eBracket, styles.eTR]} />
         <View style={[styles.eBracket, styles.eBL]} />
         <View style={[styles.eBracket, styles.eBR]} />
-        <Ionicons name="book-outline" size={40} color={C.textMuted} />
+        <Ionicons name="book-outline" size={44} color="#AEAEB2" />
       </View>
       <Text style={styles.emptyTitle}>No History Yet</Text>
       <Text style={styles.emptySubtext}>
         Scan your first homework problem to get started
       </Text>
-      <TouchableOpacity style={styles.emptyBtn} onPress={onScan}>
-        <Ionicons name="camera-outline" size={18} color="#000" />
+      <TouchableOpacity style={styles.emptyBtn} onPress={onScan} activeOpacity={0.7}>
+        <Ionicons name="camera-outline" size={18} color="#FFF" />
         <Text style={styles.emptyBtnText}>Scan a Problem</Text>
       </TouchableOpacity>
     </View>
@@ -55,24 +48,19 @@ export default function HistoryScreen() {
   const { history, loading, deleteResult, clearHistory, reload } = useHistory();
 
   useFocusEffect(
-    useCallback(() => {
-      void reload();
-    }, [reload])
+    useCallback(() => { void reload(); }, [reload])
   );
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      Alert.alert('Delete?', 'Remove this problem from history?', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteResult(id) },
-      ]);
-    },
-    [deleteResult]
-  );
+  const handleDelete = useCallback((id: string) => {
+    Alert.alert('Delete?', 'Remove this problem from history?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => deleteResult(id) },
+    ]);
+  }, [deleteResult]);
 
   const handleClearAll = useCallback(() => {
     if (history.length === 0) return;
-    Alert.alert('Clear All?', 'This will remove all saved problems permanently.', [
+    Alert.alert('Clear All?', 'Remove all saved problems permanently?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Clear All', style: 'destructive', onPress: () => clearHistory() },
     ]);
@@ -92,7 +80,7 @@ export default function HistoryScreen() {
   if (loading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color={C.textMuted} />
+        <ActivityIndicator size="large" color="#AEAEB2" />
       </View>
     );
   }
@@ -105,9 +93,9 @@ export default function HistoryScreen() {
           <Text style={styles.headerSub}>{history.length} problems solved</Text>
         </View>
         {history.length > 0 && (
-          <TouchableOpacity style={styles.clearBtn} onPress={handleClearAll}>
-            <Ionicons name="trash-outline" size={16} color={C.danger} />
-            <Text style={styles.clearBtnText}>Clear</Text>
+          <TouchableOpacity style={styles.clearBtn} onPress={handleClearAll} activeOpacity={0.7}>
+            <Ionicons name="trash-outline" size={15} color="#FF3B30" />
+            <Text style={styles.clearText}>Clear</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -116,10 +104,7 @@ export default function HistoryScreen() {
         data={history}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.listContent,
-          history.length === 0 && styles.listEmpty,
-        ]}
+        contentContainerStyle={[styles.list, history.length === 0 && styles.listEmpty]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={<EmptyState onScan={() => navigation.navigate('Scan')} />}
       />
@@ -128,73 +113,48 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0B0B0B' },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0B0B0B' },
+  safeArea: { flex: 1, backgroundColor: '#EFEFEF' },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EFEFEF' },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: C.border,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 18, paddingBottom: 14,
   },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: C.text },
-  headerSub: { fontSize: 12, color: C.textMuted, marginTop: 2 },
+  headerTitle: { fontSize: 26, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.3 },
+  headerSub: { fontSize: 12, color: '#AEAEB2', marginTop: 2, fontWeight: '500' },
   clearBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    backgroundColor: 'rgba(255,69,58,0.1)',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,69,58,0.2)',
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 7,
+    backgroundColor: '#FFFFFF', borderRadius: 12,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
   },
-  clearBtnText: { fontSize: 13, fontWeight: '600', color: C.danger },
+  clearText: { fontSize: 13, fontWeight: '600', color: '#FF3B30' },
 
-  listContent: { padding: 16 },
+  list: { padding: 16 },
   listEmpty: { flex: 1 },
 
   emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    gap: 12,
+    flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12,
   },
-  emptyBrackets: {
-    width: 110,
-    height: 110,
-    marginBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+  emptyBracketBox: {
+    width: 120, height: 120, marginBottom: 8,
+    alignItems: 'center', justifyContent: 'center', position: 'relative',
   },
-  eBracket: {
-    position: 'absolute',
-    width: 22,
-    height: 22,
-    borderColor: C.textMuted,
-  },
-  eTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
-  eTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 },
-  eBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
-  eBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', color: C.text },
-  emptySubtext: { fontSize: 14, color: C.textMuted, textAlign: 'center', lineHeight: 21 },
+  eBracket: { position: 'absolute', width: CORNER, height: CORNER, borderColor: '#AEAEB2' },
+  eTL: { top: 0, left: 0, borderTopWidth: THICK, borderLeftWidth: THICK },
+  eTR: { top: 0, right: 0, borderTopWidth: THICK, borderRightWidth: THICK },
+  eBL: { bottom: 0, left: 0, borderBottomWidth: THICK, borderLeftWidth: THICK },
+  eBR: { bottom: 0, right: 0, borderBottomWidth: THICK, borderRightWidth: THICK },
+
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
+  emptySubtext: { fontSize: 14, color: '#6C6C70', textAlign: 'center', lineHeight: 21 },
   emptyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: C.text,
-    borderRadius: 14,
-    paddingHorizontal: 24,
-    paddingVertical: 13,
-    marginTop: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#1C1C1E', borderRadius: 16,
+    paddingHorizontal: 24, paddingVertical: 13, marginTop: 8,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12, shadowRadius: 8, elevation: 3,
   },
-  emptyBtnText: { fontSize: 15, fontWeight: '700', color: '#000' },
+  emptyBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
 });

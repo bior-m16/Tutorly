@@ -3,16 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Step } from '../types';
 
-const C = {
-  surface: '#1A1A1A',
-  surfaceHigh: '#242424',
-  border: '#2C2C2E',
-  text: '#FFFFFF',
-  textMuted: '#8E8E93',
-  accent: '#FFFFFF',
-  formula: '#0A84FF',
-};
-
 interface Props {
   step: Step;
   isLast: boolean;
@@ -25,8 +15,8 @@ export default function StepCard({ step, isLast }: Props) {
     <View style={styles.container}>
       {/* Timeline */}
       <View style={styles.timeline}>
-        <View style={styles.numberBubble}>
-          <Text style={styles.numberText}>{step.stepNumber}</Text>
+        <View style={styles.numBubble}>
+          <Text style={styles.numText}>{step.stepNumber}</Text>
         </View>
         {!isLast && <View style={styles.connector} />}
       </View>
@@ -36,13 +26,13 @@ export default function StepCard({ step, isLast }: Props) {
         <TouchableOpacity
           style={styles.header}
           onPress={() => setExpanded((v) => !v)}
-          activeOpacity={0.6}
+          activeOpacity={0.65}
         >
           <Text style={styles.title}>{step.title}</Text>
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={16}
-            color={C.textMuted}
+            color="#AEAEB2"
           />
         </TouchableOpacity>
 
@@ -63,36 +53,42 @@ export default function StepCard({ step, isLast }: Props) {
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', marginBottom: 4 },
-  timeline: { alignItems: 'center', width: 36, marginRight: 10 },
-  numberBubble: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: C.surfaceHigh,
-    borderWidth: 1,
-    borderColor: C.border,
+  timeline: { alignItems: 'center', width: 34, marginRight: 10 },
+  numBubble: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#1C1C1E',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  numberText: { color: C.text, fontSize: 13, fontWeight: '700' },
+  numText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   connector: {
     width: 1,
     flex: 1,
-    backgroundColor: C.border,
+    backgroundColor: '#E0E0E5',
     marginTop: 4,
     marginBottom: -4,
   },
   card: {
     flex: 1,
-    backgroundColor: C.surface,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: C.border,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  cardLast: { borderColor: '#3A3A3C' },
+  cardLast: {},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -103,27 +99,27 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '700',
-    color: C.text,
+    color: '#1C1C1E',
     marginRight: 8,
   },
   body: { paddingHorizontal: 13, paddingBottom: 13 },
   explanation: {
     fontSize: 13,
-    color: C.textMuted,
+    color: '#6C6C70',
     lineHeight: 20,
   },
   formulaBox: {
     marginTop: 10,
-    backgroundColor: 'rgba(10,132,255,0.1)',
-    borderRadius: 8,
-    padding: 10,
+    backgroundColor: '#F5F5F7',
+    borderRadius: 10,
+    padding: 11,
     borderLeftWidth: 3,
-    borderLeftColor: C.formula,
+    borderLeftColor: '#1C1C1E',
   },
   formulaText: {
     fontFamily: 'monospace',
     fontSize: 13,
-    color: C.formula,
+    color: '#1C1C1E',
     fontWeight: '600',
   },
 });

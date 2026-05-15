@@ -1,30 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Subject } from '../types';
 
-// All badges use the same dark surface style — subject is distinguished by a colored dot
-const SUBJECT_DOTS: Record<Subject, string> = {
-  Math: '#0A84FF',
-  Physics: '#64D2FF',
-  Chemistry: '#30D158',
-  Biology: '#34C759',
-  History: '#FF9F0A',
-  Literature: '#BF5AF2',
-  Geography: '#32ADE6',
-  'Computer Science': '#0A84FF',
-  Other: '#8E8E93',
-};
-
-const SUBJECT_ICONS: Record<Subject, string> = {
-  Math: '∑',
-  Physics: '⚛',
-  Chemistry: '⚗',
-  Biology: '🧬',
-  History: '📜',
-  Literature: '📖',
-  Geography: '🌍',
-  'Computer Science': '💻',
-  Other: '📚',
+const SUBJECT_META: Record<Subject, { icon: keyof typeof Ionicons.glyphMap }> = {
+  Math:             { icon: 'calculator-outline' },
+  Physics:          { icon: 'planet-outline' },
+  Chemistry:        { icon: 'flask-outline' },
+  Biology:          { icon: 'leaf-outline' },
+  History:          { icon: 'library-outline' },
+  Literature:       { icon: 'book-outline' },
+  Geography:        { icon: 'earth-outline' },
+  'Computer Science': { icon: 'code-slash-outline' },
+  Other:            { icon: 'help-circle-outline' },
 };
 
 interface Props {
@@ -33,20 +21,18 @@ interface Props {
 }
 
 export default function SubjectBadge({ subject, size = 'md' }: Props) {
-  const dot = SUBJECT_DOTS[subject] ?? '#8E8E93';
-  const icon = SUBJECT_ICONS[subject] ?? '📚';
+  const meta = SUBJECT_META[subject] ?? SUBJECT_META.Other;
+  const isLg = size === 'lg';
+  const isSm = size === 'sm';
 
   return (
-    <View
-      style={[
-        styles.badge,
-        size === 'sm' && styles.badgeSm,
-        size === 'lg' && styles.badgeLg,
-      ]}
-    >
-      <View style={[styles.dot, { backgroundColor: dot }]} />
-      <Text style={[styles.icon, size === 'sm' && styles.iconSm]}>{icon}</Text>
-      <Text style={[styles.label, size === 'sm' && styles.labelSm, size === 'lg' && styles.labelLg]}>
+    <View style={[styles.badge, isSm && styles.badgeSm, isLg && styles.badgeLg]}>
+      <Ionicons
+        name={meta.icon}
+        size={isSm ? 11 : isLg ? 16 : 13}
+        color="#6C6C70"
+      />
+      <Text style={[styles.label, isSm && styles.labelSm, isLg && styles.labelLg]}>
         {subject}
       </Text>
     </View>
@@ -57,21 +43,16 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
     alignSelf: 'flex-start',
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#2C2C2E',
+    backgroundColor: '#EFEFEF',
   },
   badgeSm: { paddingHorizontal: 8, paddingVertical: 3 },
   badgeLg: { paddingHorizontal: 14, paddingVertical: 8 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  icon: { fontSize: 12 },
-  iconSm: { fontSize: 10 },
-  label: { fontSize: 12, fontWeight: '600', color: '#FFFFFF' },
+  label: { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
   labelSm: { fontSize: 11 },
   labelLg: { fontSize: 15 },
 });

@@ -1,9 +1,9 @@
 import React from 'react';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
@@ -14,24 +14,16 @@ import { RootStackParamList, BottomTabParamList } from '../types';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-const C = {
-  bg: '#0B0B0B',
-  surface: '#141414',
-  border: '#2C2C2E',
-  text: '#FFFFFF',
-  textMuted: '#48484A',
-  active: '#FFFFFF',
-};
-
 const NAV_THEME = {
-  ...DarkTheme,
+  ...DefaultTheme,
   colors: {
-    ...DarkTheme.colors,
-    background: C.bg,
-    card: C.surface,
-    border: C.border,
-    text: C.text,
-    primary: C.text,
+    ...DefaultTheme.colors,
+    background: '#EFEFEF',
+    card: '#FFFFFF',
+    border: 'rgba(0,0,0,0.06)',
+    text: '#1C1C1E',
+    primary: '#1C1C1E',
+    notification: '#FF3B30',
   },
 };
 
@@ -40,28 +32,28 @@ function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, size }) => {
-          const icons: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
-            Home: ['home', 'home-outline'],
-            History: ['time', 'time-outline'],
+          const map: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
+            Home:    ['home',  'home-outline'],
+            History: ['time',  'time-outline'],
           };
-          const [active, inactive] = icons[route.name] ?? ['home', 'home-outline'];
+          const [active, inactive] = map[route.name] ?? ['home', 'home-outline'];
           return (
             <Ionicons
               name={focused ? active : inactive}
               size={size}
-              color={focused ? C.active : C.textMuted}
+              color={focused ? '#1C1C1E' : '#AEAEB2'}
             />
           );
         },
-        tabBarActiveTintColor: C.active,
-        tabBarInactiveTintColor: C.textMuted,
+        tabBarActiveTintColor: '#1C1C1E',
+        tabBarInactiveTintColor: '#AEAEB2',
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="History" component={HistoryScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="History" component={HistoryScreen} options={{ title: 'History' }} />
     </Tab.Navigator>
   );
 }
@@ -83,9 +75,10 @@ export default function AppNavigator() {
             headerShown: true,
             title: 'Solution',
             headerBackTitle: 'Back',
-            headerStyle: { backgroundColor: C.surface },
-            headerTintColor: C.text,
+            headerStyle: { backgroundColor: '#FFFFFF' },
+            headerTintColor: '#1C1C1E',
             headerShadowVisible: false,
+            headerTitleStyle: { fontWeight: '700', fontSize: 17 },
           }}
         />
       </Stack.Navigator>
@@ -95,13 +88,15 @@ export default function AppNavigator() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: C.surface,
-    borderTopWidth: 1,
-    borderTopColor: C.border,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 8,
     paddingBottom: 4,
     height: 60,
-    elevation: 0,
-    shadowOpacity: 0,
   },
   tabLabel: {
     fontSize: 11,
