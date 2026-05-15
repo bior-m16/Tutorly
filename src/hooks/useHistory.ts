@@ -15,7 +15,7 @@ export function useHistory() {
         setHistory(JSON.parse(stored) as HomeworkResult[]);
       }
     } catch {
-      // silently fail — start with empty history
+      // start with empty history on error
     } finally {
       setLoading(false);
     }
@@ -26,36 +26,24 @@ export function useHistory() {
   }, [loadHistory]);
 
   const saveResult = useCallback(async (result: HomeworkResult) => {
-    try {
-      setHistory((prev) => {
-        const updated = [result, ...prev];
-        void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        return updated;
-      });
-    } catch {
-      // silently fail
-    }
+    setHistory((prev) => {
+      const updated = [result, ...prev];
+      void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   const deleteResult = useCallback(async (id: string) => {
-    try {
-      setHistory((prev) => {
-        const updated = prev.filter((item) => item.id !== id);
-        void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        return updated;
-      });
-    } catch {
-      // silently fail
-    }
+    setHistory((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   const clearHistory = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEY);
-      setHistory([]);
-    } catch {
-      // silently fail
-    }
+    await AsyncStorage.removeItem(STORAGE_KEY);
+    setHistory([]);
   }, []);
 
   return { history, loading, saveResult, deleteResult, clearHistory, reload: loadHistory };

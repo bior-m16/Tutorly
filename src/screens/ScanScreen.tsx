@@ -9,7 +9,8 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { CameraView, CameraViewRef, useCameraPermissions } from 'expo-camera';
+// SDK 51: CameraView is a class component; ref type is CameraView
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -29,7 +30,8 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [analyzing, setAnalyzing] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const cameraRef = useRef<CameraViewRef>(null);
+  // SDK 51: ref holds the CameraView class instance (has takePictureAsync)
+  const cameraRef = useRef<CameraView>(null);
 
   const processImage = useCallback(
     async (uri: string) => {
@@ -54,7 +56,8 @@ export default function ScanScreen() {
   const handleCapture = useCallback(async () => {
     if (!cameraRef.current) return;
     try {
-      const photo = await cameraRef.current.takePicture({ quality: 0.85 });
+      // SDK 51: use takePictureAsync on the class instance
+      const photo = await cameraRef.current.takePictureAsync({ quality: 0.85 });
       if (photo?.uri) {
         setCapturedUri(photo.uri);
         await processImage(photo.uri);
@@ -80,7 +83,7 @@ export default function ScanScreen() {
     }
   }, [processImage]);
 
-  // Web: gallery only
+  // Web: gallery only (camera not supported in browser)
   if (Platform.OS === 'web') {
     return (
       <View style={styles.webContainer}>
@@ -142,7 +145,7 @@ export default function ScanScreen() {
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing="back" />
 
-      {/* Scrim */}
+      {/* Scrim overlay with transparent viewfinder cutout */}
       <View style={styles.overlay}>
         <View style={styles.overlayTop} />
         <View style={styles.overlayRow}>
@@ -167,7 +170,7 @@ export default function ScanScreen() {
         <View style={{ width: 40 }} />
       </SafeAreaView>
 
-      {/* Hint */}
+      {/* Hint below viewfinder */}
       <View style={styles.hintRow}>
         <Text style={styles.hintText}>Align your homework in the frame</Text>
       </View>
@@ -193,11 +196,15 @@ export default function ScanScreen() {
         <View style={{ width: 56 }} />
       </View>
 
-      {/* Analyzing */}
+      {/* Analyzing overlay */}
       {analyzing && (
         <View style={styles.analyzingOverlay}>
           {capturedUri && (
-            <Image source={{ uri: capturedUri }} style={styles.capturedPreview} resizeMode="cover" />
+            <Image
+              source={{ uri: capturedUri }}
+              style={styles.capturedPreview}
+              resizeMode="cover"
+            />
           )}
           <View style={styles.analyzingCard}>
             <ActivityIndicator size="large" color="#1C1C1E" />
@@ -213,15 +220,22 @@ export default function ScanScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
 
-  // Web
+  // ── Web ──────────────────────────────────────────────────────────────
   webContainer: {
-    flex: 1, backgroundColor: '#EFEFEF',
-    alignItems: 'center', justifyContent: 'center', padding: 24,
+    flex: 1,
+    backgroundColor: '#EFEFEF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
   },
   webClose: { position: 'absolute', top: 56, left: 20 },
   webBracketBox: {
-    width: 160, height: 160, marginBottom: 32,
-    alignItems: 'center', justifyContent: 'center', position: 'relative',
+    width: 160,
+    height: 160,
+    marginBottom: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   wCorner: { position: 'absolute', width: 26, height: 26, borderColor: '#AEAEB2' },
   wTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
@@ -229,45 +243,79 @@ const styles = StyleSheet.create({
   wBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
   wBR: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2 },
   webIconCircle: {
-    width: 100, height: 100, borderRadius: 50,
-    backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08, shadowRadius: 12, elevation: 3,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   webTitle: { fontSize: 22, fontWeight: '700', color: '#1C1C1E', marginBottom: 8 },
-  webSub: { fontSize: 13, color: '#6C6C70', textAlign: 'center', marginBottom: 32 },
+  webSub: {
+    fontSize: 13,
+    color: '#6C6C70',
+    textAlign: 'center',
+    marginBottom: 32,
+  },
   webBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: '#FFFFFF', borderRadius: 18,
-    paddingHorizontal: 28, paddingVertical: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   webBtnText: { fontSize: 15, fontWeight: '600', color: '#6C6C70' },
   webAnalyzing: { marginTop: 32, alignItems: 'center', gap: 12 },
   webAnalyzingText: { fontSize: 14, color: '#6C6C70' },
 
-  // Permission
+  // ── Permission ────────────────────────────────────────────────────────
   permContainer: {
-    flex: 1, backgroundColor: '#EFEFEF',
-    alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12,
+    flex: 1,
+    backgroundColor: '#EFEFEF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+    gap: 12,
   },
   permIconBox: {
-    width: 80, height: 80, borderRadius: 40,
-    backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08, shadowRadius: 12, elevation: 3, marginBottom: 8,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    marginBottom: 8,
   },
   permTitle: { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
   permText: { fontSize: 14, color: '#6C6C70', textAlign: 'center', lineHeight: 21 },
   permBtn: {
-    backgroundColor: '#1C1C1E', borderRadius: 16,
-    paddingHorizontal: 32, paddingVertical: 14, marginTop: 8,
+    backgroundColor: '#1C1C1E',
+    borderRadius: 16,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    marginTop: 8,
   },
   permBtnText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
   permGallery: { color: '#6C6C70', fontSize: 14, fontWeight: '600' },
 
-  // Camera overlay
+  // ── Camera overlay ────────────────────────────────────────────────────
   overlay: { ...StyleSheet.absoluteFillObject },
   overlayTop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
   overlayRow: { flexDirection: 'row', height: VIEWFINDER },
@@ -280,17 +328,29 @@ const styles = StyleSheet.create({
   cBL: { bottom: 0, left: 0, borderBottomWidth: THICK, borderLeftWidth: THICK, borderBottomLeftRadius: 3 },
   cBR: { bottom: 0, right: 0, borderBottomWidth: THICK, borderRightWidth: THICK, borderBottomRightRadius: 3 },
 
+  // ── Top bar ───────────────────────────────────────────────────────────
   topBar: {
-    position: 'absolute', top: 0, left: 0, right: 0,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingBottom: 8,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
   iconBtn: {
-    width: 38, height: 38, borderRadius: 19,
-    backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   topLabel: { color: '#FFF', fontSize: 16, fontWeight: '700' },
 
+  // ── Hint ──────────────────────────────────────────────────────────────
   hintRow: {
     position: 'absolute',
     top: '50%',
@@ -299,42 +359,63 @@ const styles = StyleSheet.create({
     marginTop: VIEWFINDER / 2 + 16,
     alignItems: 'center',
   },
-  hintText: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 13,
-    fontWeight: '500',
-  },
+  hintText: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontWeight: '500' },
 
+  // ── Bottom controls ───────────────────────────────────────────────────
   bottomBar: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 36, paddingBottom: 52, paddingTop: 20,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 36,
+    paddingBottom: 52,
+    paddingTop: 20,
   },
   sideBtn: { width: 56, alignItems: 'center', gap: 5 },
   sideBtnLabel: { color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: '600' },
   captureBtn: { alignItems: 'center', justifyContent: 'center' },
   captureRing: {
-    width: 76, height: 76, borderRadius: 38,
-    borderWidth: 3, borderColor: '#FFF',
-    alignItems: 'center', justifyContent: 'center',
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 3,
+    borderColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   captureDot: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#FFF' },
 
-  // Analyzing
+  // ── Analyzing overlay ─────────────────────────────────────────────────
   analyzingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.75)',
-    alignItems: 'center', justifyContent: 'center', padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
   },
   capturedPreview: {
-    width: 180, height: 180, borderRadius: 16, marginBottom: 24,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    width: 180,
+    height: 180,
+    borderRadius: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   analyzingCard: {
-    backgroundColor: '#FFFFFF', borderRadius: 20, padding: 28,
-    alignItems: 'center', width: '100%', gap: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15, shadowRadius: 20, elevation: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 28,
+    alignItems: 'center',
+    width: '100%',
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
   },
   analyzingTitle: { fontSize: 18, fontWeight: '700', color: '#1C1C1E' },
   analyzingText: { fontSize: 13, color: '#6C6C70' },

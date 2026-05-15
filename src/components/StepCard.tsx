@@ -13,7 +13,6 @@ export default function StepCard({ step, isLast }: Props) {
 
   return (
     <View style={styles.container}>
-      {/* Timeline */}
       <View style={styles.timeline}>
         <View style={styles.numBubble}>
           <Text style={styles.numText}>{step.stepNumber}</Text>
@@ -21,8 +20,7 @@ export default function StepCard({ step, isLast }: Props) {
         {!isLast && <View style={styles.connector} />}
       </View>
 
-      {/* Card */}
-      <View style={[styles.card, isLast && styles.cardLast]}>
+      <View style={[styles.card, cardShadow]}>
         <TouchableOpacity
           style={styles.header}
           onPress={() => setExpanded((v) => !v)}
@@ -51,9 +49,17 @@ export default function StepCard({ step, isLast }: Props) {
   );
 }
 
+const cardShadow = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+  elevation: 2,
+};
+
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', marginBottom: 4 },
-  timeline: { alignItems: 'center', width: 34, marginRight: 10 },
+  container:  { flexDirection: 'row', marginBottom: 4 },
+  timeline:   { alignItems: 'center', width: 34, marginRight: 10 },
   numBubble: {
     width: 30,
     height: 30,
@@ -68,46 +74,25 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  numText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  connector: {
-    width: 1,
-    flex: 1,
-    backgroundColor: '#E0E0E5',
-    marginTop: 4,
-    marginBottom: -4,
-  },
+  numText:   { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
+  connector: { width: 1, flex: 1, backgroundColor: '#E0E0E5', marginTop: 4, marginBottom: -4 },
+
   card: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
     marginBottom: 10,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  cardLast: {},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 13,
   },
-  title: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    marginRight: 8,
-  },
-  body: { paddingHorizontal: 13, paddingBottom: 13 },
-  explanation: {
-    fontSize: 13,
-    color: '#6C6C70',
-    lineHeight: 20,
-  },
+  title: { flex: 1, fontSize: 14, fontWeight: '700', color: '#1C1C1E', marginRight: 8 },
+  body:  { paddingHorizontal: 13, paddingBottom: 13 },
+  explanation: { fontSize: 13, color: '#6C6C70', lineHeight: 20 },
   formulaBox: {
     marginTop: 10,
     backgroundColor: '#F5F5F7',
@@ -116,10 +101,5 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: '#1C1C1E',
   },
-  formulaText: {
-    fontFamily: 'monospace',
-    fontSize: 13,
-    color: '#1C1C1E',
-    fontWeight: '600',
-  },
+  formulaText: { fontFamily: 'monospace', fontSize: 13, color: '#1C1C1E', fontWeight: '600' },
 });

@@ -57,13 +57,13 @@ function getMimeType(uri: string): string {
 
 async function imageUriToBase64(uri: string): Promise<{ base64: string; mediaType: string }> {
   if (Platform.OS === 'web') {
-    // On web, URIs from expo-image-picker are blob: or data: URLs
+    // On web, expo-image-picker returns blob: or data: URIs
     if (uri.startsWith('data:')) {
       const [header, base64] = uri.split(',');
       const mediaType = header.replace('data:', '').replace(';base64', '');
       return { base64, mediaType };
     }
-    // blob: URL — fetch and convert via FileReader
+    // blob: URL — use fetch + FileReader
     const response = await fetch(uri);
     const blob = await response.blob();
     const mediaType = blob.type || 'image/jpeg';
@@ -71,15 +71,14 @@ async function imageUriToBase64(uri: string): Promise<{ base64: string; mediaTyp
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
-        const base64 = result.split(',')[1] ?? '';
-        resolve({ base64, mediaType });
+        resolve({ base64: result.split(',')[1] ?? '', mediaType });
       };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
   }
 
-  // Native path — expo-file-system is only imported here so it never loads on web
+  // Native: dynamic import keeps expo-file-system out of the web bundle
   const FileSystem = await import('expo-file-system');
   const base64 = await FileSystem.readAsStringAsync(uri, {
     encoding: FileSystem.EncodingType.Base64,

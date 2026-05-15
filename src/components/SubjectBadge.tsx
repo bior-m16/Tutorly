@@ -3,16 +3,16 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Subject } from '../types';
 
-const SUBJECT_META: Record<Subject, { icon: keyof typeof Ionicons.glyphMap }> = {
-  Math:             { icon: 'calculator-outline' },
-  Physics:          { icon: 'planet-outline' },
-  Chemistry:        { icon: 'flask-outline' },
-  Biology:          { icon: 'leaf-outline' },
-  History:          { icon: 'library-outline' },
-  Literature:       { icon: 'book-outline' },
-  Geography:        { icon: 'earth-outline' },
+const META: Record<Subject, { icon: keyof typeof Ionicons.glyphMap }> = {
+  Math:               { icon: 'calculator-outline' },
+  Physics:            { icon: 'planet-outline' },
+  Chemistry:          { icon: 'flask-outline' },
+  Biology:            { icon: 'leaf-outline' },
+  History:            { icon: 'library-outline' },
+  Literature:         { icon: 'book-outline' },
+  Geography:          { icon: 'earth-outline' },
   'Computer Science': { icon: 'code-slash-outline' },
-  Other:            { icon: 'help-circle-outline' },
+  Other:              { icon: 'help-circle-outline' },
 };
 
 interface Props {
@@ -21,17 +21,13 @@ interface Props {
 }
 
 export default function SubjectBadge({ subject, size = 'md' }: Props) {
-  const meta = SUBJECT_META[subject] ?? SUBJECT_META.Other;
+  const { icon } = META[subject] ?? META.Other;
   const isLg = size === 'lg';
   const isSm = size === 'sm';
 
   return (
     <View style={[styles.badge, isSm && styles.badgeSm, isLg && styles.badgeLg]}>
-      <Ionicons
-        name={meta.icon}
-        size={isSm ? 11 : isLg ? 16 : 13}
-        color="#6C6C70"
-      />
+      <Ionicons name={icon} size={isSm ? 11 : isLg ? 16 : 13} color="#6C6C70" />
       <Text style={[styles.label, isSm && styles.labelSm, isLg && styles.labelLg]}>
         {subject}
       </Text>
@@ -52,7 +48,7 @@ const styles = StyleSheet.create({
   },
   badgeSm: { paddingHorizontal: 8, paddingVertical: 3 },
   badgeLg: { paddingHorizontal: 14, paddingVertical: 8 },
-  label: { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
+  label:   { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
   labelSm: { fontSize: 11 },
   labelLg: { fontSize: 15 },
 });
