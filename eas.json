@@ -1,0 +1,28 @@
+{
+  "cli": {
+    "version": ">= 10.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
+      }
+    },
+    "production": {
+      "env": {
+        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

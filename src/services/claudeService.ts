@@ -1,10 +1,24 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { HomeworkResult, Step, Subject, Difficulty } from '../types';
+
+function getApiKey(): string {
+  // Primary: value embedded at build time via app.config.js `extra`
+  const fromExtra = (Constants.expoConfig?.extra as { anthropicApiKey?: string } | undefined)
+    ?.anthropicApiKey;
+  if (fromExtra) return fromExtra;
+
+  // Fallback for local `expo start` with a .env file
+  const fromEnv = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
+  if (fromEnv) return fromEnv;
+
+  return '';
+}
 
 const getClient = () =>
   new Anthropic({
-    apiKey: process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ?? '',
+    apiKey: getApiKey(),
     dangerouslyAllowBrowser: true,
   });
 
