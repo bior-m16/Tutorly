@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { analyzeHomeworkImage } from '../services/claudeService';
+import { analyzeHomeworkImage, friendlyError } from '../services/claudeService';
 import { RootStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -40,8 +40,7 @@ export default function ScanScreen() {
         const result = await analyzeHomeworkImage(uri);
         navigation.replace('Result', { result });
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Unable to analyze the image. Please try again.';
+        const message = friendlyError(err);
         Alert.alert('Analysis Failed', message, [
           { text: 'Try Again', onPress: () => setCapturedUri(null) },
           { text: 'Cancel', onPress: () => navigation.goBack() },

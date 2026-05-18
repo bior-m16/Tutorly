@@ -16,11 +16,17 @@ function getApiKey(): string {
   return '';
 }
 
-const getClient = () =>
-  new Anthropic({
-    apiKey: getApiKey(),
-    dangerouslyAllowBrowser: true,
-  });
+function getClient(): Anthropic {
+  const key = getApiKey();
+  if (!key) {
+    throw new Error(
+      'Anthropic API key is not configured.\n\n' +
+      'For local dev: add EXPO_PUBLIC_ANTHROPIC_API_KEY to your .env file.\n' +
+      'For EAS builds: run  eas secret:create --name ANTHROPIC_API_KEY'
+    );
+  }
+  return new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+}
 
 const SYSTEM_PROMPT = `You are Tutorly, an expert AI tutor that helps students understand their homework problems step by step.
 
@@ -110,7 +116,47 @@ function parseClaudeResponse(text: string): ClaudeResponse {
   return parsed;
 }
 
+export function friendlyError(err: unknown): string {
+  if (err instanceof Error) {
+    const msg = err.message;
+    // Anthropic SDK surfaces HTTP errors as messages starting with the status code
+    if (msg.startsWith('401') || msg.includes('authentication_error') || msg.includes('invalid x-api-key')) {
+      return 'Invalid API key. Check that ANTHROPIC_API_KEY is set correctly in your EAS secrets or .env file.';
+    }
+    if (msg.startsWith('429') || msg.includes('rate_limit')) {
+      return 'Rate limit reached. Please wait a moment and try again.';
+    }
+    if (msg.startsWith('5') || msg.includes('502') || msg.includes('503') || msg.includes('Bad Gateway')) {
+      return 'Anthropic servers are temporarily unavailable. Please try again in a moment.';
+    }
+    // Strip raw HTML/JSON noise — only return the first 200 chars
+    if (msg.includes('<html') || msg.includes('{')) {
+      return 'Unable to reach the AI service. Please check your internet connection and try again.';
+    }
+    return msg.length > 200 ? msg.slice(0, 200) + '…' : msg;
+  }
+  return 'An unexpected error occurred. Please try again.';
+}
+
+async function callWithRetry(fn: () => Promise<HomeworkResult>): Promise<HomeworkResult> {
+  try {
+    return await fn();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '';
+    const isTransient = msg.includes('502') || msg.includes('503') || msg.includes('529') || msg.includes('Bad Gateway');
+    if (isTransient) {
+      await new Promise((r) => setTimeout(r, 2000));
+      return fn();
+    }
+    throw err;
+  }
+}
+
 export async function analyzeHomeworkImage(imageUri: string): Promise<HomeworkResult> {
+  return callWithRetry(() => _analyze(imageUri));
+}
+
+async function _analyze(imageUri: string): Promise<HomeworkResult> {
   const client = getClient();
   const { base64, mediaType } = await imageUriToBase64(imageUri);
 
