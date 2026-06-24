@@ -10,8 +10,11 @@ import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 const PLATFORMS = ['tiktok', 'instagram', 'youtube'] as const;
 
@@ -60,6 +63,7 @@ export default function CreateCampaignScreen() {
   }
 
   return (
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Field label="Campaign Title *">
@@ -156,6 +160,7 @@ export default function CreateCampaignScreen() {
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
@@ -169,7 +174,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
+  container: { flex: 1, backgroundColor: 'rgba(255,255,255,0.78)' },
   content: { padding: 20, gap: 20, paddingBottom: 40 },
   field: { gap: 6 },
   label: { fontSize: 13, fontWeight: '600', color: '#000' },

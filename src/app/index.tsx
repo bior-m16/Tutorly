@@ -5,52 +5,59 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.hero}>
-        <View style={styles.logoMark}>
-          <Text style={styles.logoText}>UGC</Text>
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.hero}>
+          <View style={styles.logoMark}>
+            <Text style={styles.logoText}>UGC</Text>
+          </View>
+          <Text style={styles.appName}>UGC Hub</Text>
+          <Text style={styles.tagline}>
+            Connect brands with creators.{'\n'}Create. Collab. Grow.
+          </Text>
         </View>
-        <Text style={styles.appName}>UGC Hub</Text>
-        <Text style={styles.tagline}>
-          Connect brands with creators.{'\n'}Create. Collab. Grow.
-        </Text>
-      </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => router.push('/login')}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.primaryBtnText}>Sign In</Text>
-        </TouchableOpacity>
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => router.push('/login')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.primaryBtnText}>Sign In</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryBtn}
-          onPress={() => router.push('/signup')}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.secondaryBtnText}>Create Account</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => router.push('/signup')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.secondaryBtnText}>Create Account</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.legal}>
-          By continuing you agree to our Terms &amp; Privacy Policy.
-        </Text>
-      </View>
-    </SafeAreaView>
+          <Text style={styles.legal}>
+            By continuing you agree to our Terms &amp; Privacy Policy.
+          </Text>
+        </View>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.78)',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -88,37 +95,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  actions: {
-    gap: 12,
-  },
+  actions: { gap: 12 },
   primaryBtn: {
     backgroundColor: '#000',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  primaryBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   secondaryBtn: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#000',
   },
-  secondaryBtnText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  legal: {
-    textAlign: 'center',
-    fontSize: 12,
-    color: '#aaa',
-    marginTop: 4,
-  },
+  secondaryBtnText: { color: '#000', fontSize: 16, fontWeight: '700' },
+  legal: { textAlign: 'center', fontSize: 12, color: '#aaa', marginTop: 4 },
 });

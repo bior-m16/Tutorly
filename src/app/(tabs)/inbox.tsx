@@ -9,8 +9,11 @@ import {
   ActivityIndicator,
   RefreshControl,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 type Conversation = {
   id: string;
@@ -113,6 +116,7 @@ export default function InboxScreen() {
   }
 
   return (
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
     <SafeAreaView style={styles.container}>
       <FlatList
         data={conversations}
@@ -128,11 +132,14 @@ export default function InboxScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
+  container: { flex: 1, backgroundColor: 'rgba(255,255,255,0.78)' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   sectionTitle: {
     fontSize: 16,

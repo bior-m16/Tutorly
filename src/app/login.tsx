@@ -11,8 +11,11 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -36,71 +39,75 @@ export default function LoginScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.inner}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to your UGC Hub account</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="you@example.com"
-              placeholderTextColor="#bbb"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+          style={styles.inner}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Welcome back</Text>
+            <Text style={styles.subtitle}>Sign in to your UGC Hub account</Text>
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              placeholderTextColor="#bbb"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-            />
+          <View style={styles.form}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="you@example.com"
+                placeholderTextColor="#bbb"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+            </View>
+
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="••••••••"
+                placeholderTextColor="#bbb"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoComplete="password"
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.primaryBtn, loading && styles.disabledBtn]}
+              onPress={handleLogin}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.primaryBtnText}>Sign In</Text>
+              )}
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.primaryBtn, loading && styles.disabledBtn]}
-            onPress={handleLogin}
-            disabled={loading}
-            activeOpacity={0.85}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.primaryBtnText}>Sign In</Text>
-            )}
+          <TouchableOpacity onPress={() => router.push('/signup')} style={styles.footer}>
+            <Text style={styles.footerText}>
+              Don't have an account?{' '}
+              <Text style={styles.footerLink}>Sign up</Text>
+            </Text>
           </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity onPress={() => router.push('/signup')} style={styles.footer}>
-          <Text style={styles.footerText}>
-            Don't have an account?{' '}
-            <Text style={styles.footerLink}>Sign up</Text>
-          </Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
+  container: { flex: 1, backgroundColor: 'rgba(255,255,255,0.78)' },
   inner: { flex: 1, paddingHorizontal: 24, justifyContent: 'center', gap: 32 },
   header: { gap: 6 },
   title: { fontSize: 28, fontWeight: '800', color: '#000' },
@@ -116,7 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     fontSize: 15,
     color: '#000',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: 'rgba(255,255,255,0.9)',
   },
   primaryBtn: {
     backgroundColor: '#000',

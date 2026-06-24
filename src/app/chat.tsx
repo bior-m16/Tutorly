@@ -11,8 +11,11 @@ import {
   Platform,
   ActivityIndicator,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 type Message = { id: string; sender_id: string; content: string; created_at: string };
 
@@ -118,6 +121,7 @@ export default function ChatScreen() {
   }
 
   return (
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
     <SafeAreaView style={styles.container}>
       <View style={styles.chatHeader}>
         <View style={styles.headerAvatar}>
@@ -165,11 +169,14 @@ export default function ChatScreen() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
+  container: { flex: 1, backgroundColor: 'rgba(255,255,255,0.78)' },
   flex: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   chatHeader: {

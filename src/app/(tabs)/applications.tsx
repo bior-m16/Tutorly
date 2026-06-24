@@ -10,8 +10,11 @@ import {
   RefreshControl,
   SafeAreaView,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
+
+const BG = { uri: 'https://raw.githubusercontent.com/bior-m16/Pawell/main/UGC%20Hub%20Background.png' };
 
 type Profile = { id: string; full_name: string; role: 'business' | 'creator' };
 type Application = {
@@ -190,6 +193,7 @@ export default function ApplicationsScreen() {
   }
 
   return (
+    <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImage}>
     <SafeAreaView style={styles.container}>
       <FlatList
         data={applications}
@@ -213,6 +217,7 @@ export default function ApplicationsScreen() {
         }
       />
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
@@ -231,7 +236,9 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  bg: { flex: 1 },
+  bgImage: { opacity: 0.18 },
+  container: { flex: 1, backgroundColor: 'rgba(255,255,255,0.78)' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   sectionTitle: {
     fontSize: 16,
