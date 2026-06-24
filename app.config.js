@@ -1,51 +1,38 @@
 module.exports = {
   expo: {
-    name: 'Tutorly',
-    slug: 'tutorly',
+    name: 'UGC Hub',
+    slug: 'ugc-hub',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
+    scheme: 'ugchub',
     userInterfaceStyle: 'light',
     splash: {
       image: './assets/splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#EFEFEF',
+      backgroundColor: '#ffffff',
     },
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.tutorly.app',
-      infoPlist: {
-        NSCameraUsageDescription: 'Tutorly needs camera access to scan your homework problems',
-        NSPhotoLibraryUsageDescription: 'Tutorly needs photo library access to upload homework images',
-      },
+      bundleIdentifier: 'com.ugchub.app',
     },
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#000000',
       },
-      permissions: [
-        'android.permission.CAMERA',
-        'android.permission.READ_EXTERNAL_STORAGE',
-      ],
-      package: 'com.tutorly.app',
+      package: 'com.ugchub.app',
     },
     web: {
       favicon: './assets/favicon.png',
       bundler: 'metro',
     },
-    plugins: [
-      ['expo-camera', { cameraPermission: 'Tutorly needs camera access to scan your homework' }],
-      ['expo-image-picker', { photosPermission: 'Tutorly needs photo access to upload homework images' }],
-    ],
+    plugins: ['expo-router'],
+    experiments: {
+      typedRoutes: true,
+    },
     extra: {
-      // Read at build time from EAS secret or local .env — never shipped as a
-      // plain EXPO_PUBLIC_ string so it isn't trivially grep-able in the bundle.
-      anthropicApiKey:
-        process.env.ANTHROPIC_API_KEY ??
-        process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ??
-        '',
       eas: { projectId: process.env.EAS_PROJECT_ID ?? '' },
     },
   },
