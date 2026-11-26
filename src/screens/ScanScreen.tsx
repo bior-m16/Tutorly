@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   Platform,
   Image,
@@ -18,6 +17,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { analyzeHomeworkImage, friendlyError } from '../services/claudeService';
 import { RootStackParamList } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -41,7 +41,7 @@ export default function ScanScreen() {
         navigation.replace('Result', { result });
       } catch (err) {
         const message = friendlyError(err);
-        Alert.alert('Analysis Failed', message, [
+        showAlert('Analysis Failed', message, [
           { text: 'Try Again', onPress: () => setCapturedUri(null) },
           { text: 'Cancel', onPress: () => navigation.goBack() },
         ]);
@@ -62,14 +62,14 @@ export default function ScanScreen() {
         await processImage(photo.uri);
       }
     } catch {
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
+      showAlert('Error', 'Failed to take photo. Please try again.');
     }
   }, [processImage]);
 
   const handlePickFromGallery = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Needed', 'Please allow access to your photo library in Settings.');
+      showAlert('Permission Needed', 'Please allow access to your photo library in Settings.');
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
