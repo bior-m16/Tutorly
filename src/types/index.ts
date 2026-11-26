@@ -24,6 +24,20 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
+export interface Flashcard {
+  front: string;
+  back: string;
+}
+
+export interface Deck {
+  id: string;
+  title: string;
+  cards: Flashcard[];
+  createdAt: string;
+}
+
+export type StudyKind = 'quiz' | 'flashcards';
+
 export interface ChatTurn {
   role: 'user' | 'assistant';
   text: string;
@@ -60,8 +74,9 @@ export type RootStackParamList = {
   Result: { result: HomeworkResult };
   Ask: { result: HomeworkResult; stepNumber?: number };
   TypeQuestion: undefined;
-  QuizSetup: undefined;
+  StudySetup: { kind: StudyKind };
   Quiz: { quiz: Quiz };
+  Flashcards: { deck: Deck };
 };
 
 export type BottomTabParamList = {

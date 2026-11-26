@@ -59,7 +59,7 @@ export default function QuizScreen() {
             <Ionicons name="refresh" size={18} color="#FFF" />
             <Text style={styles.primaryText}>Try again</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondary} onPress={() => navigation.replace('QuizSetup')} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.secondary} onPress={() => navigation.replace('StudySetup', { kind: 'quiz' })} activeOpacity={0.8}>
             <Text style={styles.secondaryText}>New quiz</Text>
           </TouchableOpacity>
         </View>
