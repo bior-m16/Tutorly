@@ -19,6 +19,8 @@ import WritingResultScreen from '../screens/WritingResultScreen';
 import SummarizeScreen from '../screens/SummarizeScreen';
 import SummaryResultScreen from '../screens/SummaryResultScreen';
 import QuizScreen from '../screens/QuizScreen';
+import TutorScreen from '../screens/TutorScreen';
+import LiveTutorScreen from '../screens/LiveTutorScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,6 +55,7 @@ function TabNavigator() {
         tabBarIcon: ({ focused, size }) => {
           const map: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
             Home:    ['home',  'home-outline'],
+            Tutor:   ['chatbubbles', 'chatbubbles-outline'],
             History: ['time',  'time-outline'],
           };
           const [active, inactive] = map[route.name] ?? ['home', 'home-outline'];
@@ -72,6 +75,7 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="Tutor" component={TutorScreen} options={{ title: 'Tutor' }} />
       <Tab.Screen name="History" component={HistoryScreen} options={{ title: 'History' }} />
     </Tab.Navigator>
   );
@@ -117,6 +121,7 @@ export default function AppNavigator() {
         <Stack.Screen name="StudySetup" component={StudySetupScreen} options={{ ...HEADER, title: '' }} />
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ ...HEADER, title: 'Quiz' }} />
         <Stack.Screen name="Calculator" component={CalculatorScreen} />
+        <Stack.Screen name="LiveTutor" component={LiveTutorScreen} options={{ presentation: 'fullScreenModal' }} />
         <Stack.Screen name="Summarize" component={SummarizeScreen} options={{ ...HEADER, title: 'Summarize' }} />
         <Stack.Screen name="SummaryResult" component={SummaryResultScreen} options={{ ...HEADER, title: 'Summary' }} />
         <Stack.Screen name="Writing" component={WritingScreen} />

@@ -6,6 +6,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@elevenlabs/react-native": [
+        "node_modules/@elevenlabs/react-native/dist/index.d.ts"
       ]
     }
   },

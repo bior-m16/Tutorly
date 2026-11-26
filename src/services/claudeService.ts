@@ -13,7 +13,7 @@ export class LimitReachedError extends Error {
   }
 }
 
-async function callTutor(body: Record<string, unknown>): Promise<{ text: string }> {
+async function callTutor(body: Record<string, unknown>): Promise<{ text: string; [key: string]: unknown }> {
   await ensureSession();
   const { data, error } = await supabase.functions.invoke('tutor', { body });
   if (error) {
@@ -26,7 +26,7 @@ async function callTutor(body: Record<string, unknown>): Promise<{ text: string 
     throw error;
   }
   if (!data?.text) throw new Error('No response from the tutor');
-  return data as { text: string };
+  return data as { text: string; [key: string]: unknown };
 }
 
 interface ClaudeResponse {
@@ -103,6 +103,9 @@ export function friendlyError(err: unknown): string {
     }
     if (msg.startsWith('429') || msg.includes('busy')) {
       return 'Rate limit reached. Please wait a moment and try again.';
+    }
+    if (msg.includes('voice_not_configured')) {
+      return 'The live tutor is not switched on yet. Try the text tutor for now.';
     }
     if (msg.startsWith('5') || msg.includes('502') || msg.includes('503') || msg.includes('Bad Gateway')) {
       return 'The tutor is temporarily unavailable. Please try again in a moment.';
@@ -295,4 +298,26 @@ export function summaryToText(s: Summary): string {
   const parts = [s.title, '', s.tldr, '', 'Key points:', ...s.points.map((p) => `• ${p}`)];
   if (s.terms.length) parts.push('', 'Key terms:', ...s.terms.map((t) => `${t.term}: ${t.meaning}`));
   return parts.join('\n');
+}
+
+export type ChatMode = 'study_fast' | 'study_guided' | 'chat';
+
+/** Sends a Tutor tab conversation (oldest first, ending with the student's turn) and returns the reply. */
+export async function tutorChat(mode: ChatMode, messages: ChatTurn[], imageUri?: string): Promise<string> {
+  const body: Record<string, unknown> = { action: 'chat', mode, messages: messages.slice(-40) };
+  if (imageUri) {
+    const { base64, mediaType } = await imageUriToBase64(imageUri);
+    body.image = base64;
+    body.mediaType = mediaType;
+  }
+  const { text } = await callTutor(body);
+  return text.trim();
+}
+
+/** Asks the backend for a short-lived token that opens one live voice tutor session. */
+export async function startVoiceSession(): Promise<string> {
+  const data = await callTutor({ action: 'voice_session' });
+  const token = data.conversationToken;
+  if (typeof token !== 'string' || !token) throw new Error('502 voice_unavailable');
+  return token;
 }
