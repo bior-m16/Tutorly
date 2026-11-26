@@ -108,6 +108,15 @@ function writePrompt(mode: string, opts: any, hasImage: boolean): string | null 
   return null;
 }
 
+const SUMMARY_SYSTEM = `You summarise study material for students. Respond with only valid JSON:
+{"title":"<short title>","tldr":"<the gist in one or two sentences>","points":["<key point>", ...],"terms":[{"term":"...","meaning":"<one sentence>"}]}
+Keep points short and in the order the material presents them. Include terms only for words a student would need to learn (0 to 8). Do not add facts that are not in the material.`;
+const SUMMARY_LENGTH: Record<string, string> = {
+  Brief: '3 to 4 key points',
+  Standard: '5 to 7 key points',
+  Detailed: '8 to 12 key points, each with a short supporting detail',
+};
+
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') ?? '' });
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -269,6 +278,34 @@ Deno.serve(async (req) => {
         model: MODEL,
         max_tokens: 3000,
         system: WRITE_SYSTEM,
+        messages: [{ role: 'user', content }],
+      });
+      return json({ text: text(res) });
+    }
+
+    if (body.action === 'summarize') {
+      const { text: input, image, mediaType, length, simple } = body;
+      const hasImage = typeof image === 'string' && image.length > 0;
+      const hasText = typeof input === 'string' && input.trim().length > 0;
+      if (!hasImage && !hasText) return json({ error: 'bad_request' }, 400);
+      if (hasText && input.length > MAX_TEXT * 3) return json({ error: 'too_long' }, 400);
+      if (hasImage && (image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType))) return json({ error: 'bad_image' }, 400);
+      if (!(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
+      const size = SUMMARY_LENGTH[length] ?? SUMMARY_LENGTH.Standard;
+      const instruction = `Summarise ${hasImage ? 'the material in the attached photo' : 'the text below'} in ${size}.${simple === true ? ' Use simple words a 12-year-old would understand.' : ''}`;
+      const content: Array<Anthropic.Messages.ImageBlockParam | Anthropic.Messages.TextBlockParam> = [];
+      if (hasImage) content.push({ type: 'image', source: { type: 'base64', media_type: mediaType, data: image } });
+      content.push({ type: 'text', text: hasText ? `${instruction}\n\n${input}` : instruction });
+      const res = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 2048,
+        system: SUMMARY_SYSTEM,
         messages: [{ role: 'user', content }],
       });
       return json({ text: text(res) });

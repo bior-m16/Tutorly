@@ -57,6 +57,16 @@ export interface WritingPiece {
   createdAt: string;
 }
 
+export interface Summary {
+  id: string;
+  title: string;
+  tldr: string;
+  points: string[];
+  terms: { term: string; meaning: string }[];
+  source: string;
+  createdAt: string;
+}
+
 export type StudyKind = 'quiz' | 'flashcards';
 
 export interface ChatTurn {
@@ -98,6 +108,8 @@ export type RootStackParamList = {
   Calculator: undefined;
   Writing: undefined;
   WritingResult: { piece: WritingPiece };
+  Summarize: undefined;
+  SummaryResult: { summary: Summary };
   StudySetup: { kind: StudyKind };
   Quiz: { quiz: Quiz };
   Flashcards: { deck: Deck };
