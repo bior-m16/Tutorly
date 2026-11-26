@@ -5,7 +5,6 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -15,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHistory } from '../hooks/useHistory';
 import HistoryItem from '../components/HistoryItem';
 import { HomeworkResult, RootStackParamList } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -50,7 +50,7 @@ export default function HistoryScreen() {
   );
 
   const handleDelete = useCallback((id: string) => {
-    Alert.alert('Delete?', 'Remove this problem from history?', [
+    showAlert('Delete?', 'Remove this problem from history?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteResult(id) },
     ]);
@@ -58,7 +58,7 @@ export default function HistoryScreen() {
 
   const handleClearAll = useCallback(() => {
     if (history.length === 0) return;
-    Alert.alert('Clear All?', 'Remove all saved problems permanently?', [
+    showAlert('Clear All?', 'Remove all saved problems permanently?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Clear All', style: 'destructive', onPress: () => clearHistory() },
     ]);

@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -18,6 +17,7 @@ import StepCard from '../components/StepCard';
 import SubjectBadge from '../components/SubjectBadge';
 import { RootStackParamList, PracticeProblem } from '../types';
 import { generatePractice, friendlyError } from '../services/claudeService';
+import { showAlert } from '../utils/alert';
 
 type RouteT = RouteProp<RootStackParamList, 'Result'>;
 type Nav    = NativeStackNavigationProp<RootStackParamList>;
@@ -55,7 +55,7 @@ export default function ResultScreen() {
     try {
       setPractice(await generatePractice(result));
     } catch (err) {
-      Alert.alert('Could not make practice problems', friendlyError(err));
+      showAlert('Could not make practice problems', friendlyError(err));
     } finally {
       setPracticeLoading(false);
     }
@@ -65,7 +65,7 @@ export default function ResultScreen() {
     if (saved) return;
     await saveResult(practice ? { ...result, practice } : result);
     setSaved(true);
-    Alert.alert('Saved', 'Added to your history.');
+    showAlert('Saved', 'Added to your history.');
   };
 
   return (
