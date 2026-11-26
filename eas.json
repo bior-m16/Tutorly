@@ -5,22 +5,12 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
-      }
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "env": {
-        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
-      }
+      "distribution": "internal"
     },
-    "production": {
-      "env": {
-        "ANTHROPIC_API_KEY": "your_key_here_or_use_eas_secret"
-      }
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
