@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
-import Purchases from 'react-native-purchases';
-import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
+import type PurchasesT from 'react-native-purchases';
+import type RevenueCatUIT from 'react-native-purchases-ui';
 import { supabase, ensureSession } from './supabase';
 
 /** RevenueCat entitlement that unlocks unlimited solves. Must match the RevenueCat dashboard. */
@@ -13,8 +13,8 @@ const extra = (Constants.expoConfig?.extra ?? {}) as {
 };
 
 function apiKey(): string {
-  if (Platform.OS === 'ios') return extra.revenuecatIosKey ?? '';
-  if (Platform.OS === 'android') return extra.revenuecatAndroidKey ?? '';
+  if (Platform.OS === 'ios') return process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || extra.revenuecatIosKey || '';
+  if (Platform.OS === 'android') return process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || extra.revenuecatAndroidKey || '';
   return '';
 }
 
@@ -30,6 +30,14 @@ export function purchasesAvailable(): boolean {
   );
 }
 
+// Loaded lazily: the native modules throw at import time on web and in Expo Go.
+function sdk(): { Purchases: typeof PurchasesT; RevenueCatUI: typeof RevenueCatUIT } {
+  return {
+    Purchases: require('react-native-purchases').default,
+    RevenueCatUI: require('react-native-purchases-ui').default,
+  };
+}
+
 let configured: Promise<void> | null = null;
 
 /** Configures RevenueCat with the Supabase user id, so the webhook can credit the right account. */
@@ -39,7 +47,7 @@ function configure(): Promise<void> {
       await ensureSession();
       const { data } = await supabase.auth.getUser();
       if (!data.user) throw new Error('sign_in_failed: no user');
-      Purchases.configure({ apiKey: apiKey(), appUserID: data.user.id });
+      sdk().Purchases.configure({ apiKey: apiKey(), appUserID: data.user.id });
     })().catch((err) => {
       configured = null;
       throw err;
@@ -51,7 +59,7 @@ function configure(): Promise<void> {
 export async function hasPlus(): Promise<boolean> {
   if (!purchasesAvailable()) return false;
   await configure();
-  const info = await Purchases.getCustomerInfo();
+  const info = await sdk().Purchases.getCustomerInfo();
   return PLUS_ENTITLEMENT in info.entitlements.active;
 }
 
@@ -59,6 +67,6 @@ export async function hasPlus(): Promise<boolean> {
 export async function showPaywall(): Promise<boolean> {
   if (!purchasesAvailable()) return false;
   await configure();
-  const result = await RevenueCatUI.presentPaywall({ displayCloseButton: true });
-  return result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED;
+  const result = await sdk().RevenueCatUI.presentPaywall({ displayCloseButton: true });
+  return result === 'PURCHASED' || result === 'RESTORED';
 }
