@@ -28,6 +28,7 @@ module.exports = {
       permissions: [
         'android.permission.CAMERA',
         'android.permission.READ_EXTERNAL_STORAGE',
+        'com.android.vending.BILLING',
       ],
       package: 'com.tutorly.app',
     },
@@ -44,6 +45,9 @@ module.exports = {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL ?? 'https://qemztgyclxbnamlgbppg.supabase.co',
       supabaseKey:
         process.env.EXPO_PUBLIC_SUPABASE_KEY ?? 'sb_publishable_ZvAqMLEyBQGT_fK0Ir8lEg_6lsMXfm_',
+      // RevenueCat public SDK keys (safe to ship). Leave empty to hide purchases.
+      revenuecatIosKey: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? '',
+      revenuecatAndroidKey: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ?? '',
       eas: { projectId: process.env.EAS_PROJECT_ID ?? '' },
     },
   },

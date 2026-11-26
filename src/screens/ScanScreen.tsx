@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  AlertButton,
   ActivityIndicator,
   Platform,
   Image,
@@ -16,7 +17,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { analyzeHomeworkImage, friendlyError } from '../services/claudeService';
+import { analyzeHomeworkImage, friendlyError, LimitReachedError } from '../services/claudeService';
+import { purchasesAvailable, showPaywall } from '../services/subscriptions';
 import { RootStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -40,6 +42,32 @@ export default function ScanScreen() {
         const result = await analyzeHomeworkImage(uri);
         navigation.replace('Result', { result });
       } catch (err) {
+        if (err instanceof LimitReachedError) {
+          const buttons: AlertButton[] = [
+            { text: 'Not now', style: 'cancel', onPress: () => navigation.goBack() },
+          ];
+          if (purchasesAvailable()) {
+            buttons.push({
+              text: 'Get Tutorly Plus',
+              onPress: async () => {
+                const bought = await showPaywall().catch(() => false);
+                if (bought) {
+                  // The store confirms to our backend within seconds; retry the same photo.
+                  await new Promise((r) => setTimeout(r, 2000));
+                  void processImage(uri);
+                } else {
+                  navigation.goBack();
+                }
+              },
+            });
+          }
+          Alert.alert(
+            'Daily limit reached',
+            `${err.message} Tutorly Plus gives you unlimited solutions, practice and follow-ups.`,
+            buttons,
+          );
+          return;
+        }
         const message = friendlyError(err);
         Alert.alert('Analysis Failed', message, [
           { text: 'Try Again', onPress: () => setCapturedUri(null) },
@@ -49,6 +77,7 @@ export default function ScanScreen() {
         setAnalyzing(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [navigation]
   );
 

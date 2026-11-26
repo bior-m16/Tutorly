@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { useHistory } from '../hooks/useHistory';
 import ScanButton from '../components/ScanButton';
 import HistoryItem from '../components/HistoryItem';
 import { RootStackParamList, Subject } from '../types';
+import { purchasesAvailable, hasPlus, showPaywall } from '../services/subscriptions';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,6 +37,16 @@ export default function HomeScreen() {
   );
 
   const recentItems = history.slice(0, 3);
+
+  const [plus, setPlus] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (purchasesAvailable()) hasPlus().then(setPlus).catch(() => {});
+    }, [])
+  );
+  const goPlus = async () => {
+    if (await showPaywall().catch(() => false)) setPlus(true);
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -71,6 +82,18 @@ export default function HomeScreen() {
             <Text style={styles.galleryBtnText}>Choose from Gallery</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Plus upsell */}
+        {purchasesAvailable() && !plus ? (
+          <TouchableOpacity style={[styles.plusCard, shadow.btn]} onPress={goPlus} activeOpacity={0.8}>
+            <Ionicons name="sparkles" size={20} color="#FFD60A" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.plusTitle}>Tutorly Plus</Text>
+              <Text style={styles.plusSub}>Unlimited solutions. Free plan: 5 a day.</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
+          </TouchableOpacity>
+        ) : null}
 
         {/* Subject chips */}
         <View style={styles.section}>
@@ -134,6 +157,19 @@ const shadow = {
 };
 
 const styles = StyleSheet.create({
+  plusCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: '#1C1C1E',
+  },
+  plusTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+  plusSub: { color: '#AEAEB2', fontSize: 12, marginTop: 2 },
+
   safe:   { flex: 1, backgroundColor: '#EFEFEF' },
   scroll: { flex: 1, backgroundColor: '#EFEFEF' },
 
