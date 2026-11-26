@@ -9,6 +9,7 @@ import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import ScanScreen from '../screens/ScanScreen';
 import ResultScreen from '../screens/ResultScreen';
+import AskScreen from '../screens/AskScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -74,6 +75,19 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             title: 'Solution',
+            headerBackTitle: 'Back',
+            headerStyle: { backgroundColor: '#FFFFFF' },
+            headerTintColor: '#1C1C1E',
+            headerShadowVisible: false,
+            headerTitleStyle: { fontWeight: '700', fontSize: 17 },
+          }}
+        />
+        <Stack.Screen
+          name="Ask"
+          component={AskScreen}
+          options={{
+            headerShown: true,
+            title: 'Ask your tutor',
             headerBackTitle: 'Back',
             headerStyle: { backgroundColor: '#FFFFFF' },
             headerTintColor: '#1C1C1E',

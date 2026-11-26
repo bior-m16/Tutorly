@@ -3,6 +3,18 @@ export interface Step {
   title: string;
   explanation: string;
   formula?: string;
+  /** A nudge toward this step that doesn't give it away (used by hint-first mode). */
+  hint?: string;
+}
+
+export interface PracticeProblem {
+  question: string;
+  answer: string;
+}
+
+export interface ChatTurn {
+  role: 'user' | 'assistant';
+  text: string;
 }
 
 export type Subject =
@@ -27,12 +39,14 @@ export interface HomeworkResult {
   imageUri: string;
   timestamp: string;
   difficulty: Difficulty;
+  practice?: PracticeProblem[];
 }
 
 export type RootStackParamList = {
   Main: undefined;
   Scan: undefined;
   Result: { result: HomeworkResult };
+  Ask: { result: HomeworkResult; stepNumber?: number };
 };
 
 export type BottomTabParamList = {
