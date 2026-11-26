@@ -45,6 +45,69 @@ Vary which position holds the correct answer.`;
 const FLASHCARDS_SYSTEM = `You write study flashcards for students. Write 10 to 15 cards that cover the key terms, facts and ideas at the level the material suggests. The front is a short prompt (a term, a question or a fill-in-the-blank) and the back is a concise answer of at most 30 words. Respond with only valid JSON:
 {"title":"<short deck title>","cards":[{"front":"...","back":"..."}]}`;
 
+const WRITE_SYSTEM = `You are Tutorly's writing helper for students. Write in plain text: no Markdown symbols such as #, * or **. Use short headings on their own line and blank lines between paragraphs. Use numbered or lettered lines for outlines. Write original text in the student's requested style. Respond with only the requested writing, with no preamble or closing remarks.`;
+
+const WRITE_OPTIONS = {
+  format: ['General', 'Email', 'Essay topic ideas', 'Academic', 'Business', 'Creative', 'Blog'],
+  tone: ['Auto', 'Formal', 'Neutral', 'Casual'],
+  type: ['Auto', 'Expository', 'Reflective', 'Argumentative', 'Descriptive', 'Analytical', 'Comparative', 'Narrative'],
+  level: ['Foundation', 'Intermediate', 'Advanced'],
+  paragraphs: ['3', '4', '5', '6'],
+  length: ['Short', 'Medium', 'Long'],
+  change: ['Expand', 'Shorten', 'Continue writing', 'Rewrite', 'Fix grammar', 'Simplify'],
+} as const;
+const LENGTH_WORDS: Record<string, string> = { Short: 'about 300', Medium: 'about 500', Long: 'about 800' };
+const LEVEL_TEXT: Record<string, string> = {
+  Foundation: 'a middle-school student: simple vocabulary and clear structure',
+  Intermediate: 'a high-school student: varied sentences and developed arguments',
+  Advanced: 'a university student: precise vocabulary and nuanced analysis',
+};
+const CHANGE_TEXT: Record<string, string> = {
+  Expand: 'Expand this text with more detail, examples and explanation, keeping the voice and meaning.',
+  Shorten: 'Shorten this text to about half its length, keeping the key points.',
+  'Continue writing': 'Continue this text naturally for two or three more paragraphs in the same voice. Return only the new part.',
+  Rewrite: 'Rewrite this text so it reads more clearly and smoothly, keeping the meaning.',
+  'Fix grammar': 'Correct the spelling, grammar and punctuation of this text. Change as little as possible.',
+  Simplify: 'Rewrite this text in simpler words that a younger student would understand.',
+};
+
+function pick<K extends keyof typeof WRITE_OPTIONS>(opts: any, key: K): string {
+  const v = opts?.[key];
+  return (WRITE_OPTIONS[key] as readonly string[]).includes(v) ? v : WRITE_OPTIONS[key][0];
+}
+
+/** "a"/"an" plus the phrase, e.g. an argumentative essay. */
+function withArticle(phrase: string): string {
+  return `${/^[aeiou]/i.test(phrase) ? 'an' : 'a'} ${phrase}`;
+}
+
+function writePrompt(mode: string, opts: any, hasImage: boolean): string | null {
+  const source = hasImage ? 'the material in the attached photo' : 'the text below';
+  switch (mode) {
+    case 'general': {
+      const format = pick(opts, 'format');
+      const tone = pick(opts, 'tone');
+      const toneText = tone === 'Auto' ? 'a tone that suits the task' : `a ${tone.toLowerCase()} tone`;
+      if (format === 'Essay topic ideas') {
+        return `Suggest 8 essay topics based on ${source}. For each, give the topic on one line and one sentence on the angle it could take.`;
+      }
+      if (format === 'Email') return `Write an email for the request in ${source}, with a subject line, in ${toneText}.`;
+      return `Write ${withArticle(format === 'General' ? 'piece' : format.toLowerCase() + ' piece')} for the request in ${source}, in ${toneText}.`;
+    }
+    case 'outline': {
+      const type = pick(opts, 'type');
+      return `Write a well-structured ${type === 'Auto' ? '' : type.toLowerCase() + ' '}essay outline for the topic in ${source}, pitched at ${LEVEL_TEXT[pick(opts, 'level')]}. Include a working thesis, an introduction, ${pick(opts, 'paragraphs')} body paragraphs each with a topic sentence and two or three supporting points, and a conclusion.`;
+    }
+    case 'essay': {
+      const type = pick(opts, 'type');
+      return `Write ${withArticle(type === 'Auto' ? 'essay' : type.toLowerCase() + ' essay')} of ${LENGTH_WORDS[pick(opts, 'length')]} words on the topic in ${source}, pitched at ${LEVEL_TEXT[pick(opts, 'level')]}. Give it a title, an introduction with a clear thesis, body paragraphs and a conclusion.`;
+    }
+    case 'modify':
+      return `${CHANGE_TEXT[pick(opts, 'change')]} The text is ${hasImage ? 'in the attached photo' : 'below'}.`;
+  }
+  return null;
+}
+
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') ?? '' });
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -179,6 +242,34 @@ Deno.serve(async (req) => {
                 { type: 'text', text: `Make ${quiz ? 'a quiz' : 'flashcards'} on the material in these notes.` },
               ],
         }],
+      });
+      return json({ text: text(res) });
+    }
+
+    if (body.action === 'write') {
+      const { mode, text: input, image, mediaType, options } = body;
+      const hasImage = typeof image === 'string' && image.length > 0;
+      const hasText = typeof input === 'string' && input.trim().length > 0;
+      if (!hasImage && !hasText) return json({ error: 'bad_request' }, 400);
+      if (hasText && input.length > MAX_TEXT * 2) return json({ error: 'too_long' }, 400);
+      if (hasImage && (image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType))) return json({ error: 'bad_image' }, 400);
+      const instruction = writePrompt(mode, options, hasImage);
+      if (!instruction) return json({ error: 'bad_request' }, 400);
+      if (!(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
+      const content: Array<Anthropic.Messages.ImageBlockParam | Anthropic.Messages.TextBlockParam> = [];
+      if (hasImage) content.push({ type: 'image', source: { type: 'base64', media_type: mediaType, data: image } });
+      content.push({ type: 'text', text: hasText ? `${instruction}\n\n${input}` : instruction });
+      const res = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 3000,
+        system: WRITE_SYSTEM,
+        messages: [{ role: 'user', content }],
       });
       return json({ text: text(res) });
     }

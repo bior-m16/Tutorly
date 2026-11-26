@@ -33,7 +33,7 @@ const TOOLS: Tool[] = [
   { label: 'Flashcards', sub: 'Flip through key ideas', icon: 'albums-outline', tint: '#FFF4E0', go: (n) => n.navigate('StudySetup', { kind: 'flashcards' }) },
   { label: 'Calculator', sub: 'Scientific and unit converter', icon: 'calculator-outline', tint: '#FFE9EC', go: (n) => n.navigate('Calculator') },
   { label: 'Summarize', sub: 'Coming soon', icon: 'document-text-outline', tint: '#F4ECFF' },
-  { label: 'Writing help', sub: 'Coming soon', icon: 'pencil-outline', tint: '#E6F6F8' },
+  { label: 'Writing help', sub: 'Essays, outlines, emails', icon: 'pencil-outline', tint: '#E6F6F8', go: (n) => n.navigate('Writing') },
 ];
 
 export default function HomeScreen() {

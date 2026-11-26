@@ -36,6 +36,27 @@ export interface Deck {
   createdAt: string;
 }
 
+export type WriteMode = 'general' | 'outline' | 'essay' | 'modify';
+
+export interface WriteOptions {
+  format?: string;
+  tone?: string;
+  type?: string;
+  level?: string;
+  paragraphs?: string;
+  length?: string;
+  change?: string;
+}
+
+export interface WritingPiece {
+  id: string;
+  mode: WriteMode;
+  prompt: string;
+  options: WriteOptions;
+  output: string;
+  createdAt: string;
+}
+
 export type StudyKind = 'quiz' | 'flashcards';
 
 export interface ChatTurn {
@@ -75,6 +96,8 @@ export type RootStackParamList = {
   Ask: { result: HomeworkResult; stepNumber?: number };
   TypeQuestion: { initial?: string } | undefined;
   Calculator: undefined;
+  Writing: undefined;
+  WritingResult: { piece: WritingPiece };
   StudySetup: { kind: StudyKind };
   Quiz: { quiz: Quiz };
   Flashcards: { deck: Deck };
