@@ -24,13 +24,13 @@ type Tool = {
   sub: string;
   icon: keyof typeof Ionicons.glyphMap;
   tint: string;
-  route?: 'QuizSetup' | 'TypeQuestion';
+  go?: (nav: Nav) => void;
 };
 
 const TOOLS: Tool[] = [
-  { label: 'Quiz Me', sub: 'Test yourself on any topic', icon: 'help-buoy-outline', tint: '#E8F0FF', route: 'QuizSetup' },
-  { label: 'Type it', sub: 'Solve a typed question', icon: 'create-outline', tint: '#EAF8EE', route: 'TypeQuestion' },
-  { label: 'Flashcards', sub: 'Coming soon', icon: 'albums-outline', tint: '#FFF4E0' },
+  { label: 'Quiz Me', sub: 'Test yourself on any topic', icon: 'help-buoy-outline', tint: '#E8F0FF', go: (n) => n.navigate('StudySetup', { kind: 'quiz' }) },
+  { label: 'Type it', sub: 'Solve a typed question', icon: 'create-outline', tint: '#EAF8EE', go: (n) => n.navigate('TypeQuestion') },
+  { label: 'Flashcards', sub: 'Flip through key ideas', icon: 'albums-outline', tint: '#FFF4E0', go: (n) => n.navigate('StudySetup', { kind: 'flashcards' }) },
   { label: 'Summarize', sub: 'Coming soon', icon: 'document-text-outline', tint: '#F4ECFF' },
 ];
 
@@ -121,9 +121,9 @@ export default function HomeScreen() {
             {TOOLS.map((t) => (
               <TouchableOpacity
                 key={t.label}
-                style={[styles.tool, shadow.btn, !t.route && { opacity: 0.55 }]}
-                onPress={() => t.route && navigation.navigate(t.route)}
-                disabled={!t.route}
+                style={[styles.tool, shadow.btn, !t.go && { opacity: 0.55 }]}
+                onPress={() => t.go?.(navigation)}
+                disabled={!t.go}
                 activeOpacity={0.75}
               >
                 <View style={[styles.toolIcon, { backgroundColor: t.tint }]}>

@@ -42,6 +42,9 @@ const QUIZ_SYSTEM = `You write short multiple-choice quizzes for students. Write
 {"title":"<short quiz title>","questions":[{"question":"...","choices":["...","...","...","..."],"answerIndex":0,"explanation":"<one or two sentences on why the answer is right>"}]}
 Vary which position holds the correct answer.`;
 
+const FLASHCARDS_SYSTEM = `You write study flashcards for students. Write 10 to 15 cards that cover the key terms, facts and ideas at the level the material suggests. The front is a short prompt (a term, a question or a fill-in-the-blank) and the back is a concise answer of at most 30 words. Respond with only valid JSON:
+{"title":"<short deck title>","cards":[{"front":"...","back":"..."}]}`;
+
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') ?? '' });
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -148,13 +151,13 @@ Deno.serve(async (req) => {
       return json({ text: text(res) });
     }
 
-    if (body.action === 'quiz') {
+    if (body.action === 'quiz' || body.action === 'flashcards') {
       const { topic, image, mediaType } = body;
       const fromTopic = typeof topic === 'string' && topic.trim().length > 0;
       if (fromTopic ? topic.length > MAX_TEXT : typeof image !== 'string' || image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType)) {
         return json({ error: fromTopic ? 'too_long' : 'bad_image' }, 400);
       }
-      // A quiz costs about as much as a solve, so it counts toward the free daily limit.
+      // A quiz or deck costs about as much as a solve, so it counts toward the free daily limit.
       if (!(await isPlus(user.id))) {
         const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
         if (error) throw error;
@@ -162,17 +165,18 @@ Deno.serve(async (req) => {
           return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
         }
       }
+      const quiz = body.action === 'quiz';
       const res = await anthropic.messages.create({
         model: MODEL,
-        max_tokens: 2048,
-        system: QUIZ_SYSTEM,
+        max_tokens: quiz ? 2048 : 3000,
+        system: quiz ? QUIZ_SYSTEM : FLASHCARDS_SYSTEM,
         messages: [{
           role: 'user',
           content: fromTopic
-            ? `Make a quiz on this topic:\n\n${topic}`
+            ? `Make ${quiz ? 'a quiz' : 'flashcards'} on this topic:\n\n${topic}`
             : [
                 { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
-                { type: 'text', text: 'Make a quiz on the material in these notes.' },
+                { type: 'text', text: `Make ${quiz ? 'a quiz' : 'flashcards'} on the material in these notes.` },
               ],
         }],
       });

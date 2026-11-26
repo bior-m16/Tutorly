@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,17 +9,37 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { generateQuiz } from '../services/claudeService';
+import { generateFlashcards, generateQuiz } from '../services/claudeService';
+import { saveDeck, useDecks } from '../hooks/useDecks';
 import { showErrorOrPaywall } from '../utils/limit';
 import { showAlert } from '../utils/alert';
 import { RootStackParamList } from '../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
+type RouteT = RouteProp<RootStackParamList, 'StudySetup'>;
+type Source = { topic: string } | { imageUri: string };
+
+const COPY = {
+  quiz: {
+    title: 'Quiz Me',
+    lead: "Turn anything you're studying into a 5-question quiz.",
+    button: 'Make my quiz',
+    error: 'Could not make a quiz',
+  },
+  flashcards: {
+    title: 'Flashcards',
+    lead: 'Get a deck of cards for the key terms and ideas, then flip through them.',
+    button: 'Make my cards',
+    error: 'Could not make flashcards',
+  },
+};
+
+const STARTERS = ['The water cycle', 'Causes of World War I', 'Pythagorean theorem', 'Parts of a cell', 'Supply and demand', 'Newton’s laws of motion'];
 
 const SOON: { label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { label: 'From a YouTube video', icon: 'logo-youtube' },
@@ -27,18 +47,37 @@ const SOON: { label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { label: 'From a recording', icon: 'mic-outline' },
 ];
 
-export default function QuizSetupScreen() {
+export default function StudySetupScreen() {
   const navigation = useNavigation<Nav>();
+  const { kind } = useRoute<RouteT>().params;
+  const copy = COPY[kind];
   const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState<null | 'topic' | 'photo'>(null);
+  const { decks, reload } = useDecks();
 
-  const run = async (source: { topic: string } | { imageUri: string }) => {
+  useLayoutEffect(() => {
+    navigation.setOptions({ title: copy.title });
+  }, [navigation, copy.title]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (kind === 'flashcards') void reload();
+    }, [kind, reload]),
+  );
+
+  const run = async (source: Source) => {
     setLoading('topic' in source ? 'topic' : 'photo');
     try {
-      const quiz = await generateQuiz(source);
-      navigation.replace('Quiz', { quiz });
+      if (kind === 'quiz') {
+        const quiz = await generateQuiz(source);
+        navigation.replace('Quiz', { quiz });
+      } else {
+        const deck = await generateFlashcards(source);
+        await saveDeck(deck);
+        navigation.replace('Flashcards', { deck });
+      }
     } catch (err) {
-      showErrorOrPaywall('Could not make a quiz', err, () => run(source));
+      showErrorOrPaywall(copy.error, err, () => run(source));
     } finally {
       setLoading(null);
     }
@@ -63,7 +102,27 @@ export default function QuizSetupScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.lead}>Turn anything you're studying into a 5-question quiz.</Text>
+        <Text style={styles.lead}>{copy.lead}</Text>
+
+        {kind === 'flashcards' && decks.length > 0 ? (
+          <>
+            <Text style={styles.label}>Your decks</Text>
+            <View style={styles.card}>
+              {decks.slice(0, 5).map((d, i) => (
+                <React.Fragment key={d.id}>
+                  {i > 0 ? <View style={styles.sep} /> : null}
+                  <Row
+                    icon="albums-outline"
+                    label={d.title}
+                    detail={`${d.cards.length} cards`}
+                    onPress={() => navigation.navigate('Flashcards', { deck: d })}
+                    disabled={busy}
+                  />
+                </React.Fragment>
+              ))}
+            </View>
+          </>
+        ) : null}
 
         <Text style={styles.label}>Type a topic</Text>
         <View style={styles.card}>
@@ -82,7 +141,7 @@ export default function QuizSetupScreen() {
             disabled={!topic.trim() || busy}
             activeOpacity={0.8}
           >
-            {loading === 'topic' ? <ActivityIndicator color="#FFF" /> : <Text style={styles.primaryText}>Make my quiz</Text>}
+            {loading === 'topic' ? <ActivityIndicator color="#FFF" /> : <Text style={styles.primaryText}>{copy.button}</Text>}
           </TouchableOpacity>
         </View>
 
@@ -91,6 +150,21 @@ export default function QuizSetupScreen() {
           <Row icon="camera-outline" label="Scan notes" onPress={() => fromPhoto(true)} disabled={busy} loading={loading === 'photo'} />
           <View style={styles.sep} />
           <Row icon="images-outline" label="Choose a photo" onPress={() => fromPhoto(false)} disabled={busy} />
+        </View>
+
+        <Text style={styles.label}>Need an idea? Pick a starter topic</Text>
+        <View style={styles.starters}>
+          {STARTERS.map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.starter, busy && { opacity: 0.4 }]}
+              onPress={() => setTopic(t)}
+              disabled={busy}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.starterText}>{t}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.label}>Coming soon</Text>
@@ -110,6 +184,7 @@ export default function QuizSetupScreen() {
 function Row(props: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
+  detail?: string;
   onPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
@@ -125,7 +200,10 @@ function Row(props: {
       <View style={styles.rowIcon}>
         <Ionicons name={props.icon} size={18} color="#1C1C1E" />
       </View>
-      <Text style={styles.rowLabel}>{props.label}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.rowLabel} numberOfLines={1}>{props.label}</Text>
+        {props.detail ? <Text style={styles.rowDetail}>{props.detail}</Text> : null}
+      </View>
       {props.loading ? (
         <ActivityIndicator color="#1C1C1E" />
       ) : props.soon ? (
@@ -153,7 +231,11 @@ const styles = StyleSheet.create({
   primaryText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   rowIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  rowLabel: { flex: 1, fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
+  rowLabel: { fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
+  rowDetail: { fontSize: 12, color: '#6C6C70', marginTop: 1 },
   soon: { fontSize: 12, fontWeight: '700', color: '#AEAEB2' },
   sep: { height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginVertical: 4, marginLeft: 46 },
+  starters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  starter: { backgroundColor: '#FFFFFF', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
+  starterText: { fontSize: 13, fontWeight: '500', color: '#1C1C1E' },
 });

@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase, ensureSession } from './supabase';
-import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion } from '../types';
+import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion, Deck, Flashcard } from '../types';
 
 // Prompts and the model live in the backend (supabase/functions/tutor), which also
 // holds the Anthropic key and enforces the free daily limit.
@@ -196,8 +196,10 @@ export async function generatePractice(result: HomeworkResult): Promise<Practice
 }
 
 /** Makes a 5-question multiple-choice quiz from a typed topic or a photo of notes. */
-export async function generateQuiz(source: { topic: string } | { imageUri: string }): Promise<Quiz> {
-  const body: Record<string, unknown> = { action: 'quiz' };
+type StudySource = { topic: string } | { imageUri: string };
+
+async function studyRequest(action: 'quiz' | 'flashcards', source: StudySource): Promise<Record<string, unknown>> {
+  const body: Record<string, unknown> = { action };
   if ('topic' in source) {
     body.topic = source.topic;
   } else {
@@ -207,8 +209,12 @@ export async function generateQuiz(source: { topic: string } | { imageUri: strin
   }
   const { text } = await callTutor(body);
   const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No quiz returned');
-  const parsed = JSON.parse(match[0]) as { title?: string; questions?: QuizQuestion[] };
+  if (!match) throw new Error(`No ${action} returned`);
+  return JSON.parse(match[0]);
+}
+
+export async function generateQuiz(source: StudySource): Promise<Quiz> {
+  const parsed = (await studyRequest('quiz', source)) as { title?: string; questions?: QuizQuestion[] };
   const questions = (parsed.questions ?? []).filter(
     (q) =>
       q.question &&
@@ -220,4 +226,18 @@ export async function generateQuiz(source: { topic: string } | { imageUri: strin
   );
   if (questions.length === 0) throw new Error('No quiz returned');
   return { title: parsed.title || ('topic' in source ? source.topic : 'Quiz from your notes'), questions };
+}
+
+export async function generateFlashcards(source: StudySource): Promise<Deck> {
+  const parsed = (await studyRequest('flashcards', source)) as { title?: string; cards?: Flashcard[] };
+  const cards = (parsed.cards ?? [])
+    .filter((c) => c && typeof c.front === 'string' && typeof c.back === 'string' && c.front.trim() && c.back.trim())
+    .map((c) => ({ front: c.front.trim(), back: c.back.trim() }));
+  if (cards.length === 0) throw new Error('No flashcards returned');
+  return {
+    id: `deck_${Date.now()}`,
+    title: parsed.title || ('topic' in source ? source.topic : 'Cards from your notes'),
+    cards,
+    createdAt: new Date().toISOString(),
+  };
 }
