@@ -75,14 +75,25 @@ export default function ScanScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.85,
-      allowsEditing: true,
+      allowsEditing: Platform.OS !== 'web',
     });
     if (!result.canceled && result.assets[0]?.uri) {
       await processImage(result.assets[0].uri);
     }
   }, [processImage]);
 
-  // Web: gallery only (camera not supported in browser)
+  // Web: the browser's file picker. On phones, "Take Photo" opens the phone camera
+  // (an <input capture> under the hood, so it also works on plain http:// addresses).
+  const handleTakePhotoWeb = useCallback(async () => {
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+    });
+    if (!result.canceled && result.assets[0]?.uri) {
+      await processImage(result.assets[0].uri);
+    }
+  }, [processImage]);
+
   if (Platform.OS === 'web') {
     return (
       <View style={styles.webContainer}>
@@ -95,15 +106,24 @@ export default function ScanScreen() {
           <View style={[styles.wCorner, styles.wTR]} />
           <View style={[styles.wCorner, styles.wBL]} />
           <View style={[styles.wCorner, styles.wBR]} />
-          <View style={styles.webIconCircle}>
+          <TouchableOpacity style={styles.webIconCircle} onPress={handleTakePhotoWeb} activeOpacity={0.7}>
             <Ionicons name="camera-outline" size={40} color="#1C1C1E" />
-          </View>
+          </TouchableOpacity>
         </View>
 
-        <Text style={styles.webTitle}>Upload Problem</Text>
-        <Text style={styles.webSub}>Camera scanning available on mobile</Text>
+        <Text style={styles.webTitle}>Scan a Problem</Text>
+        <Text style={styles.webSub}>Take a photo of your homework or pick one you already have</Text>
 
-        <TouchableOpacity style={styles.webBtn} onPress={handlePickFromGallery} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.webBtn, styles.webBtnPrimary]}
+          onPress={handleTakePhotoWeb}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="camera-outline" size={20} color="#FFFFFF" />
+          <Text style={[styles.webBtnText, { color: '#FFFFFF' }]}>Take Photo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.webBtn, { marginTop: 12 }]} onPress={handlePickFromGallery} activeOpacity={0.7}>
           <Ionicons name="images-outline" size={20} color="#6C6C70" />
           <Text style={styles.webBtnText}>Choose from Gallery</Text>
         </TouchableOpacity>
@@ -275,6 +295,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  webBtnPrimary: { backgroundColor: '#1C1C1E' },
   webBtnText: { fontSize: 15, fontWeight: '600', color: '#6C6C70' },
   webAnalyzing: { marginTop: 32, alignItems: 'center', gap: 12 },
   webAnalyzingText: { fontSize: 14, color: '#6C6C70' },
