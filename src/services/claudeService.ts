@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase, ensureSession } from './supabase';
-import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem } from '../types';
+import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion } from '../types';
 
 // Prompts and the model live in the backend (supabase/functions/tutor), which also
 // holds the Anthropic key and enforces the free daily limit.
@@ -134,11 +134,21 @@ export async function analyzeHomeworkImage(imageUri: string): Promise<HomeworkRe
   return callWithRetry(() => _analyze(imageUri));
 }
 
+/** Solves a problem the student typed instead of photographing. */
+export async function solveTypedQuestion(question: string): Promise<HomeworkResult> {
+  return callWithRetry(async () => {
+    const { text } = await callTutor({ action: 'solve', question });
+    return toResult(parseClaudeResponse(text), '');
+  });
+}
+
 async function _analyze(imageUri: string): Promise<HomeworkResult> {
   const { base64, mediaType } = await imageUriToBase64(imageUri);
   const { text } = await callTutor({ action: 'solve', image: base64, mediaType });
-  const parsed = parseClaudeResponse(text);
+  return toResult(parseClaudeResponse(text), imageUri);
+}
 
+function toResult(parsed: ClaudeResponse, imageUri: string): HomeworkResult {
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     subject: parsed.subject,
@@ -183,4 +193,31 @@ export async function generatePractice(result: HomeworkResult): Promise<Practice
   const problems = (parsed.problems ?? []).filter((p) => p.question && p.answer);
   if (problems.length === 0) throw new Error('No practice problems returned');
   return problems.slice(0, 3);
+}
+
+/** Makes a 5-question multiple-choice quiz from a typed topic or a photo of notes. */
+export async function generateQuiz(source: { topic: string } | { imageUri: string }): Promise<Quiz> {
+  const body: Record<string, unknown> = { action: 'quiz' };
+  if ('topic' in source) {
+    body.topic = source.topic;
+  } else {
+    const { base64, mediaType } = await imageUriToBase64(source.imageUri);
+    body.image = base64;
+    body.mediaType = mediaType;
+  }
+  const { text } = await callTutor(body);
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No quiz returned');
+  const parsed = JSON.parse(match[0]) as { title?: string; questions?: QuizQuestion[] };
+  const questions = (parsed.questions ?? []).filter(
+    (q) =>
+      q.question &&
+      Array.isArray(q.choices) &&
+      q.choices.length >= 2 &&
+      Number.isInteger(q.answerIndex) &&
+      q.answerIndex >= 0 &&
+      q.answerIndex < q.choices.length,
+  );
+  if (questions.length === 0) throw new Error('No quiz returned');
+  return { title: parsed.title || ('topic' in source ? source.topic : 'Quiz from your notes'), questions };
 }

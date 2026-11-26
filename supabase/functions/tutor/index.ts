@@ -38,6 +38,10 @@ Be thorough, educational, and encouraging. Show all work. If the image is unclea
 const FOLLOW_UP_SYSTEM = `You are Tutorly, a patient tutor. A student is asking follow-up questions about a homework solution you already worked out. Answer in plain language, in at most 120 words, and check understanding with a short question when it helps. Do not just restate the whole solution.`;
 const PRACTICE_SYSTEM = `You write practice problems for students. Given a solved problem, write 3 new problems that practise the same skill at the same level, with different numbers or contexts. Respond with only valid JSON: {"problems":[{"question":"...","answer":"..."}]}. Keep each answer short: the final result, plus one line of working if needed.`;
 
+const QUIZ_SYSTEM = `You write short multiple-choice quizzes for students. Write 5 questions that test understanding, not trivia, at the level the material suggests. Each question has exactly 4 choices and one correct answer. Respond with only valid JSON:
+{"title":"<short quiz title>","questions":[{"question":"...","choices":["...","...","...","..."],"answerIndex":0,"explanation":"<one or two sentences on why the answer is right>"}]}
+Vary which position holds the correct answer.`;
+
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') ?? '' });
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -81,9 +85,10 @@ Deno.serve(async (req) => {
 
   try {
     if (body.action === 'solve') {
-      const { image, mediaType } = body;
-      if (typeof image !== 'string' || image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType)) {
-        return json({ error: 'bad_image' }, 400);
+      const { image, mediaType, question } = body;
+      const typed = typeof question === 'string' && question.trim().length > 0;
+      if (typed ? question.length > MAX_TEXT : typeof image !== 'string' || image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType)) {
+        return json({ error: typed ? 'too_long' : 'bad_image' }, 400);
       }
       const plus = await isPlus(user.id);
       if (!plus) {
@@ -99,10 +104,12 @@ Deno.serve(async (req) => {
         system: SOLVE_SYSTEM,
         messages: [{
           role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
-            { type: 'text', text: 'Please analyze this homework problem and provide a detailed step-by-step solution.' },
-          ],
+          content: typed
+            ? `Here is the homework problem, typed by the student:\n\n${question}\n\nPlease provide a detailed step-by-step solution.`
+            : [
+                { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
+                { type: 'text', text: 'Please analyze this homework problem and provide a detailed step-by-step solution.' },
+              ],
         }],
       });
       return json({ text: text(res), plus });
@@ -137,6 +144,37 @@ Deno.serve(async (req) => {
         max_tokens: 1024,
         system: PRACTICE_SYSTEM,
         messages: [{ role: 'user', content: context }],
+      });
+      return json({ text: text(res) });
+    }
+
+    if (body.action === 'quiz') {
+      const { topic, image, mediaType } = body;
+      const fromTopic = typeof topic === 'string' && topic.trim().length > 0;
+      if (fromTopic ? topic.length > MAX_TEXT : typeof image !== 'string' || image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType)) {
+        return json({ error: fromTopic ? 'too_long' : 'bad_image' }, 400);
+      }
+      // A quiz costs about as much as a solve, so it counts toward the free daily limit.
+      if (!(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
+      const res = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 2048,
+        system: QUIZ_SYSTEM,
+        messages: [{
+          role: 'user',
+          content: fromTopic
+            ? `Make a quiz on this topic:\n\n${topic}`
+            : [
+                { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
+                { type: 'text', text: 'Make a quiz on the material in these notes.' },
+              ],
+        }],
       });
       return json({ text: text(res) });
     }

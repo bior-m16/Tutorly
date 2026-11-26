@@ -14,18 +14,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHistory } from '../hooks/useHistory';
 import ScanButton from '../components/ScanButton';
 import HistoryItem from '../components/HistoryItem';
-import { RootStackParamList, Subject } from '../types';
+import { RootStackParamList } from '../types';
 import { purchasesAvailable, hasPlus, showPaywall } from '../services/subscriptions';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const SUBJECTS: { label: Subject; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { label: 'Math',       icon: 'calculator-outline' },
-  { label: 'Physics',    icon: 'planet-outline' },
-  { label: 'Chemistry',  icon: 'flask-outline' },
-  { label: 'Biology',    icon: 'leaf-outline' },
-  { label: 'History',    icon: 'library-outline' },
-  { label: 'Literature', icon: 'book-outline' },
+type Tool = {
+  label: string;
+  sub: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  tint: string;
+  route?: 'QuizSetup' | 'TypeQuestion';
+};
+
+const TOOLS: Tool[] = [
+  { label: 'Quiz Me', sub: 'Test yourself on any topic', icon: 'help-buoy-outline', tint: '#E8F0FF', route: 'QuizSetup' },
+  { label: 'Type it', sub: 'Solve a typed question', icon: 'create-outline', tint: '#EAF8EE', route: 'TypeQuestion' },
+  { label: 'Flashcards', sub: 'Coming soon', icon: 'albums-outline', tint: '#FFF4E0' },
+  { label: 'Summarize', sub: 'Coming soon', icon: 'document-text-outline', tint: '#F4ECFF' },
 ];
 
 export default function HomeScreen() {
@@ -65,6 +71,19 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Ask bar */}
+        <TouchableOpacity
+          style={[styles.askBar, shadow.btn]}
+          onPress={() => navigation.navigate('TypeQuestion')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="search" size={18} color="#AEAEB2" />
+          <Text style={styles.askText}>Ask any homework question…</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Scan')} hitSlop={10}>
+            <Ionicons name="camera-outline" size={20} color="#1C1C1E" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+
         {/* Scan card */}
         <View style={[styles.scanCard, shadow.card]}>
           <ScanButton onPress={() => navigation.navigate('Scan')} size={80} />
@@ -95,22 +114,26 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ) : null}
 
-        {/* Subject chips */}
+        {/* Study tools */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Subjects</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {SUBJECTS.map((s) => (
+          <Text style={styles.sectionTitle}>Study tools</Text>
+          <View style={styles.grid}>
+            {TOOLS.map((t) => (
               <TouchableOpacity
-                key={s.label}
-                style={[styles.chip, shadow.btn]}
-                onPress={() => navigation.navigate('Scan')}
-                activeOpacity={0.7}
+                key={t.label}
+                style={[styles.tool, shadow.btn, !t.route && { opacity: 0.55 }]}
+                onPress={() => t.route && navigation.navigate(t.route)}
+                disabled={!t.route}
+                activeOpacity={0.75}
               >
-                <Ionicons name={s.icon} size={15} color="#6C6C70" />
-                <Text style={styles.chipLabel}>{s.label}</Text>
+                <View style={[styles.toolIcon, { backgroundColor: t.tint }]}>
+                  <Ionicons name={t.icon} size={22} color="#1C1C1E" />
+                </View>
+                <Text style={styles.toolLabel}>{t.label}</Text>
+                <Text style={styles.toolSub}>{t.sub}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         {/* Recent */}
@@ -162,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginHorizontal: 16,
-    marginTop: 16,
+    marginBottom: 24,
     padding: 16,
     borderRadius: 16,
     backgroundColor: '#1C1C1E',
@@ -199,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 28,
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 20,
   },
   scanTitle: {
     fontSize: 22,
@@ -250,15 +273,22 @@ const styles = StyleSheet.create({
   },
   seeAll: { fontSize: 14, fontWeight: '600', color: '#6C6C70' },
 
-  chip: {
+  askBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    gap: 10,
+    marginHorizontal: 16,
+    marginBottom: 16,
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginRight: 8,
+    paddingVertical: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
   },
-  chipLabel: { fontSize: 13, fontWeight: '600', color: '#6C6C70' },
+  askText: { flex: 1, fontSize: 15, color: '#AEAEB2' },
+
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
+  tool: { width: '48.3%', backgroundColor: '#FFFFFF', borderRadius: 18, padding: 14 },
+  toolIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  toolLabel: { fontSize: 15, fontWeight: '700', color: '#1C1C1E' },
+  toolSub: { fontSize: 12, color: '#6C6C70', marginTop: 2 },
 });

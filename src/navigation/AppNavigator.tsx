@@ -10,10 +10,22 @@ import HistoryScreen from '../screens/HistoryScreen';
 import ScanScreen from '../screens/ScanScreen';
 import ResultScreen from '../screens/ResultScreen';
 import AskScreen from '../screens/AskScreen';
+import TypeQuestionScreen from '../screens/TypeQuestionScreen';
+import QuizSetupScreen from '../screens/QuizSetupScreen';
+import QuizScreen from '../screens/QuizScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<BottomTabParamList>();
+
+const HEADER = {
+  headerShown: true,
+  headerBackTitle: 'Back',
+  headerStyle: { backgroundColor: '#FFFFFF' },
+  headerTintColor: '#1C1C1E',
+  headerShadowVisible: false,
+  headerTitleStyle: { fontWeight: '700' as const, fontSize: 17 },
+};
 
 const NAV_THEME = {
   ...DefaultTheme,
@@ -95,6 +107,9 @@ export default function AppNavigator() {
             headerTitleStyle: { fontWeight: '700', fontSize: 17 },
           }}
         />
+        <Stack.Screen name="TypeQuestion" component={TypeQuestionScreen} options={{ ...HEADER, title: 'Type a question' }} />
+        <Stack.Screen name="QuizSetup" component={QuizSetupScreen} options={{ ...HEADER, title: 'Quiz Me' }} />
+        <Stack.Screen name="Quiz" component={QuizScreen} options={{ ...HEADER, title: 'Quiz' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

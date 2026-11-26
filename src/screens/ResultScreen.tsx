@@ -74,7 +74,13 @@ export default function ResultScreen() {
 
         {/* Image + meta row */}
         <View style={styles.hero}>
-          <Image source={{ uri: result.imageUri }} style={styles.thumbnail} resizeMode="cover" />
+          {result.imageUri ? (
+            <Image source={{ uri: result.imageUri }} style={styles.thumbnail} resizeMode="cover" />
+          ) : (
+            <View style={[styles.thumbnail, styles.typedThumb]}>
+              <Ionicons name="create-outline" size={34} color="#6C6C70" />
+            </View>
+          )}
           <View style={styles.metaCol}>
             <SubjectBadge subject={result.subject} size="md" />
             <View style={[styles.diffBadge, { backgroundColor: diff.bg }]}>
@@ -242,6 +248,7 @@ const styles = StyleSheet.create({
 
   hero: { flexDirection: 'row', padding: 16, gap: 14, alignItems: 'flex-start' },
   thumbnail: { width: 100, height: 100, borderRadius: 14, backgroundColor: '#E0E0E5' },
+  typedThumb: { alignItems: 'center', justifyContent: 'center' },
   metaCol: { flex: 1, gap: 8, paddingTop: 4 },
 
   diffBadge: {

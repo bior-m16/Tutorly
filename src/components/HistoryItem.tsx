@@ -27,7 +27,13 @@ interface Props {
 export default function HistoryItem({ item, onPress, onDelete }: Props) {
   return (
     <TouchableOpacity style={[styles.card, shadow]} onPress={onPress} activeOpacity={0.7}>
-      <Image source={{ uri: item.imageUri }} style={styles.thumb} resizeMode="cover" />
+      {item.imageUri ? (
+        <Image source={{ uri: item.imageUri }} style={styles.thumb} resizeMode="cover" />
+      ) : (
+        <View style={[styles.thumb, styles.typedThumb]}>
+          <Ionicons name="create-outline" size={24} color="#6C6C70" />
+        </View>
+      )}
 
       <View style={styles.content}>
         <View style={styles.topRow}>
@@ -76,6 +82,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   thumb:    { width: 60, height: 60, borderRadius: 10, backgroundColor: '#EFEFEF' },
+  typedThumb: { alignItems: 'center', justifyContent: 'center' },
   content:  { flex: 1, gap: 5 },
   topRow:   { flexDirection: 'row', alignItems: 'center', gap: 6 },
   diffDot:  { width: 6, height: 6, borderRadius: 3 },

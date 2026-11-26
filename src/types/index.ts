@@ -12,6 +12,18 @@ export interface PracticeProblem {
   answer: string;
 }
 
+export interface QuizQuestion {
+  question: string;
+  choices: string[];
+  answerIndex: number;
+  explanation?: string;
+}
+
+export interface Quiz {
+  title: string;
+  questions: QuizQuestion[];
+}
+
 export interface ChatTurn {
   role: 'user' | 'assistant';
   text: string;
@@ -47,6 +59,9 @@ export type RootStackParamList = {
   Scan: undefined;
   Result: { result: HomeworkResult };
   Ask: { result: HomeworkResult; stepNumber?: number };
+  TypeQuestion: undefined;
+  QuizSetup: undefined;
+  Quiz: { quiz: Quiz };
 };
 
 export type BottomTabParamList = {
