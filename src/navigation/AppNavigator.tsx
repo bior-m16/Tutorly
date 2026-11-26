@@ -16,6 +16,8 @@ import FlashcardsScreen from '../screens/FlashcardsScreen';
 import CalculatorScreen from '../screens/CalculatorScreen';
 import WritingScreen from '../screens/WritingScreen';
 import WritingResultScreen from '../screens/WritingResultScreen';
+import SummarizeScreen from '../screens/SummarizeScreen';
+import SummaryResultScreen from '../screens/SummaryResultScreen';
 import QuizScreen from '../screens/QuizScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
@@ -115,6 +117,8 @@ export default function AppNavigator() {
         <Stack.Screen name="StudySetup" component={StudySetupScreen} options={{ ...HEADER, title: '' }} />
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ ...HEADER, title: 'Quiz' }} />
         <Stack.Screen name="Calculator" component={CalculatorScreen} />
+        <Stack.Screen name="Summarize" component={SummarizeScreen} options={{ ...HEADER, title: 'Summarize' }} />
+        <Stack.Screen name="SummaryResult" component={SummaryResultScreen} options={{ ...HEADER, title: 'Summary' }} />
         <Stack.Screen name="Writing" component={WritingScreen} />
         <Stack.Screen name="WritingResult" component={WritingResultScreen} options={{ ...HEADER, title: 'Your writing' }} />
         <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ ...HEADER, title: 'Flashcards' }} />

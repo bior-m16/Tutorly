@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase, ensureSession } from './supabase';
-import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion, Deck, Flashcard, WriteMode, WriteOptions } from '../types';
+import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion, Deck, Flashcard, WriteMode, WriteOptions, Summary } from '../types';
 
 // Prompts and the model live in the backend (supabase/functions/tutor), which also
 // holds the Anthropic key and enforces the free daily limit.
@@ -258,4 +258,41 @@ export async function generateWriting(
   const out = text.trim();
   if (!out) throw new Error('Nothing was written');
   return out;
+}
+
+export async function summarize(
+  input: { text?: string; imageUri?: string },
+  opts: { length: 'Brief' | 'Standard' | 'Detailed'; simple: boolean },
+): Promise<Summary> {
+  const body: Record<string, unknown> = { action: 'summarize', length: opts.length, simple: opts.simple };
+  if (input.text?.trim()) body.text = input.text.trim();
+  if (input.imageUri) {
+    const { base64, mediaType } = await imageUriToBase64(input.imageUri);
+    body.image = base64;
+    body.mediaType = mediaType;
+  }
+  const { text } = await callTutor(body);
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No summary returned');
+  const parsed = JSON.parse(match[0]) as Partial<Summary>;
+  const points = (parsed.points ?? []).filter((p): p is string => typeof p === 'string' && p.trim().length > 0);
+  if (!parsed.tldr && points.length === 0) throw new Error('No summary returned');
+  const terms = (parsed.terms ?? []).filter((t) => t && typeof t.term === 'string' && typeof t.meaning === 'string');
+  const source = input.text?.trim() || 'From a photo';
+  return {
+    id: `s_${Date.now()}`,
+    title: parsed.title || 'Summary',
+    tldr: parsed.tldr ?? '',
+    points,
+    terms,
+    source: source.length > 120 ? source.slice(0, 120) + '…' : source,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+/** Plain-text version of a summary, for copying or for making study sets from it. */
+export function summaryToText(s: Summary): string {
+  const parts = [s.title, '', s.tldr, '', 'Key points:', ...s.points.map((p) => `• ${p}`)];
+  if (s.terms.length) parts.push('', 'Key terms:', ...s.terms.map((t) => `${t.term}: ${t.meaning}`));
+  return parts.join('\n');
 }
