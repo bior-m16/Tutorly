@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase, ensureSession } from './supabase';
-import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion, Deck, Flashcard } from '../types';
+import { HomeworkResult, Step, Subject, Difficulty, ChatTurn, PracticeProblem, Quiz, QuizQuestion, Deck, Flashcard, WriteMode, WriteOptions } from '../types';
 
 // Prompts and the model live in the backend (supabase/functions/tutor), which also
 // holds the Anthropic key and enforces the free daily limit.
@@ -240,4 +240,22 @@ export async function generateFlashcards(source: StudySource): Promise<Deck> {
     cards,
     createdAt: new Date().toISOString(),
   };
+}
+
+export async function generateWriting(
+  mode: WriteMode,
+  input: { text?: string; imageUri?: string },
+  options: WriteOptions,
+): Promise<string> {
+  const body: Record<string, unknown> = { action: 'write', mode, options };
+  if (input.text?.trim()) body.text = input.text.trim();
+  if (input.imageUri) {
+    const { base64, mediaType } = await imageUriToBase64(input.imageUri);
+    body.image = base64;
+    body.mediaType = mediaType;
+  }
+  const { text } = await callTutor(body);
+  const out = text.trim();
+  if (!out) throw new Error('Nothing was written');
+  return out;
 }
