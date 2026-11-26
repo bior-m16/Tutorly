@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +23,8 @@ const EXAMPLES = ['Solve 3x − 7 = 11', 'What causes the seasons on Earth?', 'B
 
 export default function TypeQuestionScreen() {
   const navigation = useNavigation<Nav>();
-  const [question, setQuestion] = useState('');
+  const initial = useRoute<RouteProp<RootStackParamList, 'TypeQuestion'>>().params?.initial ?? '';
+  const [question, setQuestion] = useState(initial);
   const [loading, setLoading] = useState(false);
 
   const solve = async () => {

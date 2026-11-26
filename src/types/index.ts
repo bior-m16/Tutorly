@@ -73,7 +73,8 @@ export type RootStackParamList = {
   Scan: undefined;
   Result: { result: HomeworkResult };
   Ask: { result: HomeworkResult; stepNumber?: number };
-  TypeQuestion: undefined;
+  TypeQuestion: { initial?: string } | undefined;
+  Calculator: undefined;
   StudySetup: { kind: StudyKind };
   Quiz: { quiz: Quiz };
   Flashcards: { deck: Deck };
