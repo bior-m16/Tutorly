@@ -13,6 +13,7 @@ import AskScreen from '../screens/AskScreen';
 import TypeQuestionScreen from '../screens/TypeQuestionScreen';
 import StudySetupScreen from '../screens/StudySetupScreen';
 import FlashcardsScreen from '../screens/FlashcardsScreen';
+import CalculatorScreen from '../screens/CalculatorScreen';
 import QuizScreen from '../screens/QuizScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
@@ -111,6 +112,7 @@ export default function AppNavigator() {
         <Stack.Screen name="TypeQuestion" component={TypeQuestionScreen} options={{ ...HEADER, title: 'Type a question' }} />
         <Stack.Screen name="StudySetup" component={StudySetupScreen} options={{ ...HEADER, title: '' }} />
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ ...HEADER, title: 'Quiz' }} />
+        <Stack.Screen name="Calculator" component={CalculatorScreen} />
         <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ ...HEADER, title: 'Flashcards' }} />
       </Stack.Navigator>
     </NavigationContainer>
