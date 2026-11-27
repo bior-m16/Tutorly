@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, PermissionsAndroid, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Easing, PermissionsAndroid, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,6 +32,11 @@ async function micAllowed(): Promise<boolean> {
   if (Platform.OS !== 'android') return true; // iOS and browsers ask when the call starts
   const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
   return result === PermissionsAndroid.RESULTS.GRANTED;
+}
+
+/** Removes voice-direction tags such as "[warmly]" that the agent's voice model reads as cues, not words. */
+function cleanCaption(text: string): string {
+  return text.replace(/\[[^\]]{1,30}\]\s*/g, '').replace(/\s{2,}/g, ' ').trim();
 }
 
 function clock(seconds: number): string {
@@ -77,10 +82,10 @@ function LiveCall({ lib }: { lib: Sdk }) {
 
   const conversation = lib.useConversation({
     onMessage: (m) => {
-      const text = m.message?.trim();
+      const text = cleanCaption(m.message ?? '');
       if (!text) return;
       const role = m.role === 'user' || m.source === 'user' ? 'user' : 'agent';
-      setLines((prev) => [...prev.slice(-5), { role, text }]);
+      setLines((prev) => [...prev, { role, text }]);
     },
     onError: (message) => {
       if (!closing.current) setProblem(message || 'The call dropped.');
@@ -97,6 +102,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
   const start = async () => {
     closing.current = false;
     setSeconds(0);
+    setLines([]);
     setProblem(null);
     setStarting(true);
     try {
@@ -143,24 +149,37 @@ function LiveCall({ lib }: { lib: Sdk }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seconds]);
 
-  // The orb breathes while the tutor talks and rests while it listens.
-  const pulse = useRef(new Animated.Value(0)).current;
+  // Ripples spread from the orb while the call is live: quick and bright while the tutor talks,
+  // slow and faint while it listens.
+  const ripples = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
+  const speak = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (!isSpeaking) {
-      Animated.timing(pulse, { toValue: 0, duration: 250, useNativeDriver: true }).start();
+    if (!connected) {
+      ripples.forEach((r) => r.setValue(0));
       return;
     }
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0.35, duration: 500, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-      ]),
+    const duration = isSpeaking ? 1100 : 2200;
+    const loops = ripples.map((r, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * (duration / 2)),
+          Animated.timing(r, { toValue: 1, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+          Animated.timing(r, { toValue: 0, duration: 0, useNativeDriver: true }),
+        ]),
+      ),
     );
-    loop.start();
-    return () => loop.stop();
-  }, [isSpeaking, pulse]);
-  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.18] });
-  const halo = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.15, 0.45] });
+    loops.forEach((l) => l.start());
+    Animated.timing(speak, { toValue: isSpeaking ? 1 : 0, duration: 250, useNativeDriver: true }).start();
+    return () => loops.forEach((l) => l.stop());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, isSpeaking]);
+  const orbScale = speak.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
+
+  // Keep the newest line in view.
+  const scroll = useRef<ScrollView>(null);
+  useEffect(() => {
+    setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50);
+  }, [lines.length]);
 
   const hangUp = () => {
     closing.current = true;
@@ -180,9 +199,6 @@ function LiveCall({ lib }: { lib: Sdk }) {
             ? 'Tutor is speaking'
             : 'Listening... go ahead';
 
-  const lastAgent = [...lines].reverse().find((l) => l.role === 'agent');
-  const lastUser = [...lines].reverse().find((l) => l.role === 'user');
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.top}>
@@ -193,32 +209,46 @@ function LiveCall({ lib }: { lib: Sdk }) {
         <Text style={styles.timer}>{connected ? clock(seconds) : ''}</Text>
       </View>
 
-      <View style={styles.center}>
+      <View style={styles.hero}>
         <View style={styles.orbWrap}>
-          <Animated.View style={[styles.halo, { opacity: halo, transform: [{ scale }] }]} />
-          <Animated.View style={[styles.orb, { transform: [{ scale }] }, !connected && styles.orbIdle]}>
-            <Ionicons name={isSpeaking ? 'volume-high' : 'mic'} size={38} color="#1C1C1E" />
+          {ripples.map((r, i) => (
+            <Animated.View
+              key={i}
+              style={[
+                styles.ripple,
+                {
+                  opacity: r.interpolate({ inputRange: [0, 1], outputRange: [isSpeaking ? 0.5 : 0.25, 0] }),
+                  transform: [{ scale: r.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }],
+                },
+              ]}
+            />
+          ))}
+          <Animated.View style={[styles.orb, !connected && styles.orbIdle, { transform: [{ scale: orbScale }] }]}>
+            <Ionicons name={isSpeaking ? 'volume-high' : isMuted ? 'mic-off' : 'mic'} size={30} color="#1C1C1E" />
           </Animated.View>
         </View>
         <Text style={styles.status}>{label}</Text>
+      </View>
 
+      <ScrollView ref={scroll} style={styles.transcript} contentContainerStyle={styles.transcriptContent}>
+        {lines.length === 0 && connected && !problem ? (
+          <Text style={styles.hint}>Say hi, or tell your tutor what you are working on.</Text>
+        ) : null}
+        {lines.map((l, i) => (
+          <View key={i} style={[styles.bubble, l.role === 'user' ? styles.userBubble : styles.tutorBubble]}>
+            <Text style={[styles.bubbleText, l.role === 'user' && styles.userText]}>{l.text}</Text>
+          </View>
+        ))}
         {problem ? (
-          <>
+          <View style={styles.problem}>
             <Text style={styles.lead}>{problem}</Text>
             <TouchableOpacity style={styles.primary} onPress={start}>
               <Ionicons name="refresh" size={16} color="#1C1C1E" />
-              <Text style={styles.primaryText}>Try again</Text>
+              <Text style={styles.primaryText}>{lines.length ? 'Start a new call' : 'Try again'}</Text>
             </TouchableOpacity>
-          </>
-        ) : (
-          <View style={styles.captions}>
-            {lastUser ? <Text style={styles.youSaid} numberOfLines={2}>You: {lastUser.text}</Text> : null}
-            <Text style={styles.tutorSaid} numberOfLines={5}>
-              {lastAgent?.text ?? (connected ? 'Say hi, or tell your tutor what you are working on.' : '')}
-            </Text>
           </View>
-        )}
-      </View>
+        ) : null}
+      </ScrollView>
 
       <View style={styles.controls}>
         <TouchableOpacity
@@ -227,10 +257,10 @@ function LiveCall({ lib }: { lib: Sdk }) {
           disabled={!connected}
           accessibilityLabel={isMuted ? 'Unmute' : 'Mute'}
         >
-          <Ionicons name={isMuted ? 'mic-off' : 'mic-outline'} size={26} color={isMuted ? '#1C1C1E' : '#FFFFFF'} />
+          <Ionicons name={isMuted ? 'mic-off' : 'mic-outline'} size={24} color={isMuted ? '#1C1C1E' : '#FFFFFF'} />
         </TouchableOpacity>
         <TouchableOpacity style={[styles.control, styles.hangUp]} onPress={hangUp} accessibilityLabel="End call">
-          <Ionicons name="call" size={26} color="#FFFFFF" style={{ transform: [{ rotate: '135deg' }] }} />
+          <Ionicons name="call" size={24} color="#FFFFFF" style={{ transform: [{ rotate: '135deg' }] }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -244,27 +274,32 @@ const styles = StyleSheet.create({
   topTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   timer: { width: 44, color: '#AEAEB2', fontSize: 14, textAlign: 'right', fontVariant: ['tabular-nums'] },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
-  orbWrap: { width: 220, height: 220, alignItems: 'center', justifyContent: 'center', marginBottom: 28 },
-  halo: { position: 'absolute', width: 220, height: 220, borderRadius: 110, backgroundColor: '#7FD1AE' },
-  orb: {
-    width: 150, height: 150, borderRadius: 75, backgroundColor: '#B8F0D6', alignItems: 'center', justifyContent: 'center',
-  },
+  hero: { alignItems: 'center', paddingTop: 8, paddingBottom: 12 },
+  orbWrap: { width: 170, height: 170, alignItems: 'center', justifyContent: 'center' },
+  ripple: { position: 'absolute', width: 100, height: 100, borderRadius: 50, backgroundColor: '#7FD1AE' },
+  orb: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#B8F0D6', alignItems: 'center', justifyContent: 'center' },
   orbIdle: { backgroundColor: '#5E6B66' },
-  status: { color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginBottom: 14, textAlign: 'center' },
+  status: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', textAlign: 'center' },
   title: { color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginTop: 16, textAlign: 'center' },
+  transcript: { flex: 1, width: '100%', maxWidth: 720, alignSelf: 'center' },
+  transcriptContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16, flexGrow: 1 },
+  hint: { color: '#8E8E93', fontSize: 15, textAlign: 'center', marginTop: 12 },
+  bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 10 },
+  tutorBubble: { alignSelf: 'flex-start', backgroundColor: '#24242A', borderBottomLeftRadius: 6 },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: '#B8F0D6', borderBottomRightRadius: 6 },
+  bubbleText: { color: '#F2F2F7', fontSize: 15, lineHeight: 22 },
+  userText: { color: '#1C1C1E' },
+  problem: { alignItems: 'center', marginTop: 12 },
   lead: { color: '#AEAEB2', fontSize: 15, lineHeight: 21, textAlign: 'center', marginTop: 6 },
-  captions: { minHeight: 130, alignItems: 'center' },
-  youSaid: { color: '#8E8E93', fontSize: 14, textAlign: 'center', marginBottom: 10 },
-  tutorSaid: { color: '#E5E5EA', fontSize: 17, lineHeight: 24, textAlign: 'center' },
   primary: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, backgroundColor: '#FFFFFF', borderRadius: 22,
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, backgroundColor: '#FFFFFF', borderRadius: 22,
     paddingHorizontal: 20, paddingVertical: 12,
   },
   primaryText: { color: '#1C1C1E', fontSize: 15, fontWeight: '700' },
   secondary: { marginTop: 22, borderRadius: 22, borderWidth: 1, borderColor: '#3A3A3C', paddingHorizontal: 24, paddingVertical: 11 },
   secondaryText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  controls: { flexDirection: 'row', justifyContent: 'center', gap: 36, paddingBottom: 28, paddingTop: 12 },
-  control: { width: 68, height: 68, borderRadius: 34, backgroundColor: '#2C2C2E', alignItems: 'center', justifyContent: 'center' },
+  controls: { flexDirection: 'row', justifyContent: 'center', gap: 36, paddingBottom: 20, paddingTop: 10 },
+  control: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#2C2C2E', alignItems: 'center', justifyContent: 'center' },
   controlOn: { backgroundColor: '#FFFFFF' },
   hangUp: { backgroundColor: '#FF3B30' },
 });
