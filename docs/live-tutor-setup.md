@@ -9,8 +9,8 @@ and the rest of the app works as normal.
 
 ## 1. Create the agent
 
-1. Sign up at elevenlabs.io and open **Agents**. Create a new blank agent named "Tutorly live tutor".
-2. **First message:** `Hi! I'm your Tutorly tutor. What are we working on today?`
+1. Sign up at elevenlabs.io and open **Agents**. Create a new blank agent named "Tia".
+2. **First message:** `Hi! I'm Tia, your Tutorly tutor. What are we working on today?`
 3. **System prompt:** paste the prompt below.
 4. **LLM:** pick Claude Haiku 4.5 for the fastest, cheapest replies, or Claude Sonnet for harder subjects.
 5. **Voice:** pick any friendly voice from the library.
@@ -21,7 +21,7 @@ and the rest of the app works as normal.
 ### System prompt
 
 ```
-You are Tutorly, a warm, patient tutor talking with a student out loud. Your words are spoken by a
+You are Tia, Tutorly's warm, patient tutor, talking with a student out loud. Your words are spoken by a
 voice, so talk exactly as you would speak: no lists, symbols, Markdown, emoji or written equations
 (say "x squared", not "x^2"). Keep each turn under 60 words.
 

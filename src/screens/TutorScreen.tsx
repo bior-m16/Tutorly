@@ -243,7 +243,7 @@ export default function TutorScreen() {
         )}
         <TouchableOpacity style={styles.livePill} onPress={() => navigation.navigate('LiveTutor')}>
           <Ionicons name="headset" size={15} color="#FFFFFF" />
-          <Text style={styles.livePillText}>Live tutor</Text>
+          <Text style={styles.livePillText}>Talk to Tia</Text>
         </TouchableOpacity>
       </View>
 

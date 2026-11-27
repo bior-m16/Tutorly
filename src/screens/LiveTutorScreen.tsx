@@ -7,7 +7,7 @@ import { LimitReachedError, friendlyError, startVoiceSession } from '../services
 import { showErrorOrPaywall } from '../utils/limit';
 import VoiceOrb from '../components/VoiceOrb';
 
-// The live voice tutor runs on ElevenLabs Agents. ElevenLabs handles listening, the tutor's
+// The live voice tutor, Tia, runs on ElevenLabs Agents. ElevenLabs handles listening, the tutor's
 // replies and its voice; our backend only hands out a short-lived token for each session.
 // The SDK is loaded lazily so a build without its native modules shows a message instead of crashing.
 type Sdk = typeof import('@elevenlabs/react-native');
@@ -64,7 +64,7 @@ function Unavailable() {
       <View style={styles.center}>
         <Ionicons name="headset-outline" size={44} color="#FFFFFF" />
         <Text style={styles.title}>Live tutor needs the latest app</Text>
-        <Text style={styles.lead}>Update Tutorly to talk with your tutor out loud.</Text>
+        <Text style={styles.lead}>Update Tutorly to talk with Tia out loud.</Text>
         <TouchableOpacity style={styles.secondary} onPress={() => navigation.goBack()}>
           <Text style={styles.secondaryText}>Back</Text>
         </TouchableOpacity>
@@ -94,7 +94,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
     onDisconnect: (details) => {
       if (closing.current) return;
       if (details.reason === 'error') setProblem('The call dropped. Check your connection and try again.');
-      else if (details.reason === 'agent') setProblem('Your tutor ended the call.');
+      else if (details.reason === 'agent') setProblem('Tia ended the call.');
     },
   });
   const { status, isSpeaking, isMuted, setMuted } = conversation;
@@ -108,7 +108,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
     setStarting(true);
     try {
       if (!(await micAllowed())) {
-        setProblem('Allow microphone access in Settings to talk with your tutor.');
+        setProblem('Allow microphone access in Settings to talk with Tia.');
         return;
       }
       const conversationToken = await startVoiceSession();
@@ -171,7 +171,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
         : isMuted
           ? 'You are muted'
           : isSpeaking
-            ? 'Tutor is speaking'
+            ? 'Tia is speaking'
             : 'Listening... go ahead';
 
   return (
@@ -180,7 +180,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
         <TouchableOpacity style={styles.close} onPress={hangUp} accessibilityLabel="Close">
           <Ionicons name="chevron-down" size={26} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.topTitle}>Live tutor</Text>
+        <Text style={styles.topTitle}>Tia · Live tutor</Text>
         <Text style={styles.timer}>{connected ? clock(seconds) : ''}</Text>
       </View>
 
@@ -191,7 +191,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
 
       <ScrollView ref={scroll} style={styles.transcript} contentContainerStyle={styles.transcriptContent}>
         {lines.length === 0 && connected && !problem ? (
-          <Text style={styles.hint}>Say hi, or tell your tutor what you are working on.</Text>
+          <Text style={styles.hint}>Say hi to Tia, or tell her what you are working on.</Text>
         ) : null}
         {lines.map((l, i) => (
           <View key={i} style={[styles.bubble, l.role === 'user' ? styles.userBubble : styles.tutorBubble]}>
