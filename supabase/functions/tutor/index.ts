@@ -373,14 +373,6 @@ Deno.serve(async (req) => {
       const apiKey = Deno.env.get('ELEVENLABS_API_KEY');
       const agentId = Deno.env.get('ELEVENLABS_AGENT_ID');
       if (!apiKey || !agentId) return json({ error: 'voice_not_configured' }, 503);
-      // Each live session counts once toward the free daily limit.
-      if (!(await isPlus(user.id))) {
-        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
-        if (error) throw error;
-        if ((used as number) > FREE_SOLVES_PER_DAY) {
-          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
-        }
-      }
       const res = await fetch(
         `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${encodeURIComponent(agentId)}`,
         { headers: { 'xi-api-key': apiKey } },
@@ -391,6 +383,14 @@ Deno.serve(async (req) => {
       }
       const { token: conversationToken } = await res.json();
       if (!conversationToken) return json({ error: 'voice_unavailable' }, 502);
+      // Each live session counts once toward the free daily limit, only once a call can actually start.
+      if (!(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
       return json({ text: 'ok', conversationToken });
     }
 
