@@ -9,6 +9,7 @@ import { generateWriting } from '../services/claudeService';
 import { saveWriting } from '../hooks/useWritingHistory';
 import { showErrorOrPaywall } from '../utils/limit';
 import { RootStackParamList, WritingPiece } from '../types';
+import { glow } from '../theme';
 
 type RouteT = RouteProp<RootStackParamList, 'WritingResult'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -59,7 +60,7 @@ export default function WritingResultScreen() {
           <Text style={styles.output} selectable>{piece.output}</Text>
         </View>
         <View style={styles.note}>
-          <Ionicons name="bulb-outline" size={16} color="#6C6C70" />
+          <Ionicons name="bulb-outline" size={16} color="#6B6585" />
           <Text style={styles.noteText}>Use this as a starting point. Put it in your own words and check your school's rules on AI help.</Text>
         </View>
       </ScrollView>
@@ -68,7 +69,7 @@ export default function WritingResultScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {QUICK.map((q) => (
             <TouchableOpacity key={q} style={[styles.quick, !!busy && busy !== q && { opacity: 0.4 }]} onPress={() => refine(q)} disabled={!!busy}>
-              {busy === q ? <ActivityIndicator size="small" color="#1C1C1E" /> : <Text style={styles.quickText}>{q}</Text>}
+              {busy === q ? <ActivityIndicator size="small" color="#1D1A33" /> : <Text style={styles.quickText}>{q}</Text>}
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -82,16 +83,16 @@ export default function WritingResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F7F7F9' },
+  safe: { flex: 1, backgroundColor: '#FBF8FF' },
   content: { padding: 16, paddingBottom: 24 },
-  meta: { fontSize: 12, fontWeight: '600', color: '#8E8E93', marginBottom: 10 },
+  meta: { fontSize: 12, fontWeight: '600', color: '#8D86A6', marginBottom: 10 },
   card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 18 },
-  output: { fontSize: 16, lineHeight: 25, color: '#1C1C1E' },
+  output: { fontSize: 16, lineHeight: 25, color: '#1D1A33' },
   note: { flexDirection: 'row', gap: 8, marginTop: 14, paddingHorizontal: 4 },
-  noteText: { flex: 1, fontSize: 12, color: '#6C6C70', lineHeight: 17 },
-  footer: { padding: 16, gap: 12, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' },
-  quick: { paddingHorizontal: 14, height: 36, borderRadius: 12, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center', minWidth: 70 },
-  quickText: { fontSize: 13, fontWeight: '700', color: '#1C1C1E' },
-  copy: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1C1C1E', borderRadius: 16, paddingVertical: 15 },
+  noteText: { flex: 1, fontSize: 12, color: '#6B6585', lineHeight: 17 },
+  footer: { padding: 16, gap: 12, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: 'rgba(106,76,255,0.10)' },
+  quick: { paddingHorizontal: 14, height: 36, borderRadius: 12, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center', minWidth: 70 },
+  quickText: { fontSize: 13, fontWeight: '700', color: '#1D1A33' },
+  copy: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 16, paddingVertical: 15 },
   copyText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
 });

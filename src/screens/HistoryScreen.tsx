@@ -15,6 +15,8 @@ import { useHistory } from '../hooks/useHistory';
 import HistoryItem from '../components/HistoryItem';
 import { HomeworkResult, RootStackParamList } from '../types';
 import { showAlert } from '../utils/alert';
+import { glow } from '../theme';
+import GlowBackdrop from '../components/GlowBackdrop';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,7 +31,7 @@ function EmptyState({ onScan }: { onScan: () => void }) {
         <View style={[styles.bracket, styles.bTR]} />
         <View style={[styles.bracket, styles.bBL]} />
         <View style={[styles.bracket, styles.bBR]} />
-        <Ionicons name="book-outline" size={44} color="#AEAEB2" />
+        <Ionicons name="book-outline" size={44} color="#ADA7C2" />
       </View>
       <Text style={styles.emptyTitle}>No History Yet</Text>
       <Text style={styles.emptySub}>Scan your first homework problem to get started</Text>
@@ -78,13 +80,14 @@ export default function HistoryScreen() {
   if (loading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#AEAEB2" />
+        <ActivityIndicator size="large" color="#ADA7C2" />
       </View>
     );
   }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
+      <GlowBackdrop height={300} />
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>History</Text>
@@ -110,12 +113,12 @@ export default function HistoryScreen() {
   );
 }
 
-const btnShadow   = { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 3 };
-const clearShadow = { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 };
+const btnShadow   = { shadowColor: '#6A4CFF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 3 };
+const clearShadow = { shadowColor: '#6A4CFF', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 };
 
 const styles = StyleSheet.create({
-  safe:    { flex: 1, backgroundColor: '#EFEFEF' },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EFEFEF' },
+  safe:    { flex: 1, backgroundColor: '#FFF8F5' },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF8F5' },
 
   header: {
     flexDirection: 'row',
@@ -125,8 +128,8 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 14,
   },
-  title:    { fontSize: 26, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.3 },
-  subtitle: { fontSize: 12, color: '#AEAEB2', marginTop: 2, fontWeight: '500' },
+  title:    { fontSize: 26, fontWeight: '800', color: '#1D1A33', letterSpacing: -0.3 },
+  subtitle: { fontSize: 12, color: '#ADA7C2', marginTop: 2, fontWeight: '500' },
   clearBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -156,19 +159,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  bracket: { position: 'absolute', width: CORNER, height: CORNER, borderColor: '#AEAEB2' },
+  bracket: { position: 'absolute', width: CORNER, height: CORNER, borderColor: '#ADA7C2' },
   bTL: { top: 0, left: 0,     borderTopWidth: THICK,    borderLeftWidth: THICK },
   bTR: { top: 0, right: 0,    borderTopWidth: THICK,    borderRightWidth: THICK },
   bBL: { bottom: 0, left: 0,  borderBottomWidth: THICK, borderLeftWidth: THICK },
   bBR: { bottom: 0, right: 0, borderBottomWidth: THICK, borderRightWidth: THICK },
 
-  emptyTitle:   { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
-  emptySub:     { fontSize: 14, color: '#6C6C70', textAlign: 'center', lineHeight: 21 },
+  emptyTitle:   { fontSize: 20, fontWeight: '700', color: '#1D1A33' },
+  emptySub:     { fontSize: 14, color: '#6B6585', textAlign: 'center', lineHeight: 21 },
   emptyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35),
     borderRadius: 16,
     paddingHorizontal: 24,
     paddingVertical: 13,

@@ -24,6 +24,8 @@ import { deleteTutorChat, loadTutorChats, saveTutorChat } from '../hooks/useTuto
 import { showErrorOrPaywall } from '../utils/limit';
 import { showAlert } from '../utils/alert';
 import { RootStackParamList, TutorChat, TutorTurn } from '../types';
+import { glow } from '../theme';
+import GlowBackdrop from '../components/GlowBackdrop';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Kind = 'study' | 'chat';
@@ -204,9 +206,10 @@ export default function TutorScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
+      <GlowBackdrop height={300} />
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerBtn} onPress={() => setHistoryOpen(true)} accessibilityLabel="Past chats">
-          <Ionicons name="time-outline" size={22} color="#1C1C1E" />
+          <Ionicons name="time-outline" size={22} color="#1D1A33" />
         </TouchableOpacity>
         <View style={styles.segment}>
           {(['study', 'chat'] as Kind[]).map((k) => (
@@ -227,16 +230,16 @@ export default function TutorScreen() {
           disabled={empty}
           accessibilityLabel="New chat"
         >
-          <Ionicons name="create-outline" size={22} color={empty ? '#C7C7CC' : '#1C1C1E'} />
+          <Ionicons name="create-outline" size={22} color={empty ? '#D3CCE6' : '#1D1A33'} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.subBar}>
         {kind === 'study' ? (
           <TouchableOpacity style={styles.stylePill} onPress={() => setStyleMenu(true)}>
-            <Ionicons name={STYLES[studyStyle].icon} size={15} color="#1C1C1E" />
+            <Ionicons name={STYLES[studyStyle].icon} size={15} color="#1D1A33" />
             <Text style={styles.stylePillText}>{STYLES[studyStyle].label}</Text>
-            <Ionicons name="chevron-down" size={14} color="#6C6C70" />
+            <Ionicons name="chevron-down" size={14} color="#6B6585" />
           </TouchableOpacity>
         ) : (
           <Text style={styles.subBarNote}>Everyday help, ideas and writing</Text>
@@ -253,7 +256,7 @@ export default function TutorScreen() {
             <View>
               <View style={styles.hero}>
                 <View style={styles.heroIcon}>
-                  <Ionicons name={kind === 'study' ? 'school' : 'chatbubbles'} size={28} color="#1C1C1E" />
+                  <Ionicons name={kind === 'study' ? 'school' : 'chatbubbles'} size={28} color="#1D1A33" />
                 </View>
                 <Text style={styles.heroTitle}>{kind === 'study' ? 'What are we learning today?' : "What's on your mind?"}</Text>
                 <Text style={styles.heroLead}>
@@ -264,9 +267,9 @@ export default function TutorScreen() {
               </View>
               {STARTERS[kind].map((s) => (
                 <TouchableOpacity key={s.label} style={styles.starter} onPress={() => pickStarter(s)}>
-                  <Ionicons name={s.icon} size={18} color="#1C1C1E" />
+                  <Ionicons name={s.icon} size={18} color="#1D1A33" />
                   <Text style={styles.starterText}>{s.label}</Text>
-                  <Ionicons name={'tool' in s ? 'chevron-forward' : 'arrow-up'} size={16} color="#AEAEB2" />
+                  <Ionicons name={'tool' in s ? 'chevron-forward' : 'arrow-up'} size={16} color="#ADA7C2" />
                 </TouchableOpacity>
               ))}
             </View>
@@ -284,13 +287,13 @@ export default function TutorScreen() {
           )}
           {thinking ? (
             <View style={[styles.bubble, styles.tutorBubble, styles.thinking]}>
-              <ActivityIndicator size="small" color="#6C6C70" />
+              <ActivityIndicator size="small" color="#6B6585" />
               <Text style={styles.thinkingText}>Thinking...</Text>
             </View>
           ) : null}
           {failed && !thinking ? (
             <TouchableOpacity style={styles.retry} onPress={retry}>
-              <Ionicons name="refresh" size={15} color="#1C1C1E" />
+              <Ionicons name="refresh" size={15} color="#1D1A33" />
               <Text style={styles.retryText}>Try again</Text>
             </TouchableOpacity>
           ) : null}
@@ -307,14 +310,14 @@ export default function TutorScreen() {
           ) : null}
           <View style={styles.composer}>
             <TouchableOpacity style={styles.iconBtn} onPress={attach} accessibilityLabel="Add a photo">
-              <Ionicons name="camera-outline" size={22} color="#1C1C1E" />
+              <Ionicons name="camera-outline" size={22} color="#1D1A33" />
             </TouchableOpacity>
             <TextInput
               style={styles.input}
               value={input}
               onChangeText={setInput}
               placeholder={listening ? 'Listening...' : kind === 'study' ? 'Ask your tutor anything' : 'Message Tutorly'}
-              placeholderTextColor="#AEAEB2"
+              placeholderTextColor="#ADA7C2"
               multiline
               numberOfLines={1}
               maxLength={2000}
@@ -327,7 +330,7 @@ export default function TutorScreen() {
                 onPress={toggleMic}
                 accessibilityLabel={listening ? 'Stop dictation' : 'Dictate'}
               >
-                <Ionicons name={listening ? 'stop' : 'mic-outline'} size={20} color={listening ? '#FFFFFF' : '#1C1C1E'} />
+                <Ionicons name={listening ? 'stop' : 'mic-outline'} size={20} color={listening ? '#FFFFFF' : '#1D1A33'} />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -356,12 +359,12 @@ export default function TutorScreen() {
                   setStyleMenu(false);
                 }}
               >
-                <Ionicons name={STYLES[k].icon} size={20} color="#1C1C1E" />
+                <Ionicons name={STYLES[k].icon} size={20} color="#1D1A33" />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.menuLabel}>{STYLES[k].label}</Text>
                   <Text style={styles.menuDetail}>{STYLES[k].detail}</Text>
                 </View>
-                {studyStyle === k ? <Ionicons name="checkmark" size={18} color="#1C1C1E" /> : null}
+                {studyStyle === k ? <Ionicons name="checkmark" size={18} color="#1D1A33" /> : null}
               </TouchableOpacity>
             ))}
           </View>
@@ -374,7 +377,7 @@ export default function TutorScreen() {
             <View style={styles.sheetHeader}>
               <Text style={styles.menuTitle}>Past chats</Text>
               <TouchableOpacity onPress={() => setHistoryOpen(false)} accessibilityLabel="Close">
-                <Ionicons name="close" size={22} color="#1C1C1E" />
+                <Ionicons name="close" size={22} color="#1D1A33" />
               </TouchableOpacity>
             </View>
             <ScrollView style={{ maxHeight: 420 }}>
@@ -388,7 +391,7 @@ export default function TutorScreen() {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => removeSaved(c.id)} accessibilityLabel="Delete chat" style={styles.iconBtn}>
-                    <Ionicons name="trash-outline" size={18} color="#AEAEB2" />
+                    <Ionicons name="trash-outline" size={18} color="#ADA7C2" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -401,23 +404,23 @@ export default function TutorScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6 },
   headerBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   segment: { flexDirection: 'row', backgroundColor: '#E1E1E6', borderRadius: 12, padding: 3 },
   segmentItem: { paddingHorizontal: 22, paddingVertical: 7, borderRadius: 9 },
   segmentOn: { backgroundColor: '#FFFFFF' },
-  segmentText: { fontSize: 14, fontWeight: '600', color: '#6C6C70' },
-  segmentTextOn: { color: '#1C1C1E' },
+  segmentText: { fontSize: 14, fontWeight: '600', color: '#6B6585' },
+  segmentTextOn: { color: '#1D1A33' },
   subBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 },
   stylePill: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFFFFF', borderRadius: 16,
     paddingHorizontal: 12, paddingVertical: 7,
   },
-  stylePillText: { fontSize: 13, fontWeight: '600', color: '#1C1C1E' },
-  subBarNote: { fontSize: 13, color: '#6C6C70' },
+  stylePillText: { fontSize: 13, fontWeight: '600', color: '#1D1A33' },
+  subBarNote: { fontSize: 13, color: '#6B6585' },
   livePill: {
-    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#1C1C1E', borderRadius: 16,
+    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 16,
     paddingHorizontal: 12, paddingVertical: 7,
   },
   livePillText: { fontSize: 13, fontWeight: '700', color: '#FFFFFF' },
@@ -426,31 +429,31 @@ const styles = StyleSheet.create({
   heroIcon: {
     width: 60, height: 60, borderRadius: 20, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginBottom: 14,
   },
-  heroTitle: { fontSize: 22, fontWeight: '800', color: '#1C1C1E', textAlign: 'center' },
-  heroLead: { fontSize: 14, color: '#6C6C70', marginTop: 6, textAlign: 'center' },
+  heroTitle: { fontSize: 22, fontWeight: '800', color: '#1D1A33', textAlign: 'center' },
+  heroLead: { fontSize: 14, color: '#6B6585', marginTop: 6, textAlign: 'center' },
   starter: {
     flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 14,
     paddingHorizontal: 14, paddingVertical: 13, marginBottom: 8,
   },
-  starterText: { flex: 1, fontSize: 14, fontWeight: '500', color: '#1C1C1E' },
+  starterText: { flex: 1, fontSize: 14, fontWeight: '500', color: '#1D1A33' },
   bubble: { maxWidth: '86%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 10 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: '#1C1C1E', borderBottomRightRadius: 6 },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: '#6A4CFF', borderBottomRightRadius: 6 },
   tutorBubble: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 6 },
-  bubbleText: { fontSize: 15, lineHeight: 22, color: '#1C1C1E' },
+  bubbleText: { fontSize: 15, lineHeight: 22, color: '#1D1A33' },
   userText: { color: '#FFFFFF' },
   bubbleImage: { width: 200, height: 150, borderRadius: 12, marginBottom: 6, backgroundColor: '#333' },
   thinking: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  thinkingText: { fontSize: 14, color: '#6C6C70' },
+  thinkingText: { fontSize: 14, color: '#6B6585' },
   retry: {
     alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFFFFF',
     borderRadius: 14, paddingHorizontal: 12, paddingVertical: 7,
   },
-  retryText: { fontSize: 13, fontWeight: '600', color: '#1C1C1E' },
-  composerWrap: { paddingHorizontal: 12, paddingTop: 6, paddingBottom: 10, backgroundColor: '#EFEFEF' },
+  retryText: { fontSize: 13, fontWeight: '600', color: '#1D1A33' },
+  composerWrap: { paddingHorizontal: 12, paddingTop: 6, paddingBottom: 10, backgroundColor: '#FFF8F5' },
   preview: { width: 64, height: 64, marginBottom: 6, marginLeft: 4 },
   previewImage: { width: 64, height: 64, borderRadius: 12 },
   previewClose: {
-    position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#1C1C1E',
+    position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: '#6A4CFF',
     alignItems: 'center', justifyContent: 'center',
   },
   composer: {
@@ -459,22 +462,22 @@ const styles = StyleSheet.create({
   iconBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
   micOn: { backgroundColor: '#FF3B30' },
   input: {
-    flex: 1, fontSize: 15, lineHeight: 20, color: '#1C1C1E', maxHeight: 120, paddingHorizontal: 6,
+    flex: 1, fontSize: 15, lineHeight: 20, color: '#1D1A33', maxHeight: 120, paddingHorizontal: 6,
     paddingTop: Platform.OS === 'ios' ? 9 : 8, paddingBottom: 8,
     ...(Platform.OS === 'web' ? ({ outlineWidth: 0 } as object) : {}),
   },
-  sendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#1C1C1E', alignItems: 'center', justifyContent: 'center' },
-  sendOff: { backgroundColor: '#C7C7CC' },
+  sendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), alignItems: 'center', justifyContent: 'center' },
+  sendOff: { backgroundColor: '#D3CCE6' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' },
   menu: { backgroundColor: '#FFFFFF', margin: 12, marginBottom: 32, borderRadius: 20, padding: 16 },
-  menuTitle: { fontSize: 16, fontWeight: '700', color: '#1C1C1E', marginBottom: 10 },
+  menuTitle: { fontSize: 16, fontWeight: '700', color: '#1D1A33', marginBottom: 10 },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 14 },
-  menuItemOn: { backgroundColor: '#F2F2F7' },
-  menuLabel: { fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
-  menuDetail: { fontSize: 12, color: '#6C6C70', marginTop: 2 },
+  menuItemOn: { backgroundColor: '#F4EFFF' },
+  menuLabel: { fontSize: 15, fontWeight: '600', color: '#1D1A33' },
+  menuDetail: { fontSize: 12, color: '#6B6585', marginTop: 2 },
   sheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 32 },
   sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   savedRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)',
+    flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(106,76,255,0.10)',
   },
 });

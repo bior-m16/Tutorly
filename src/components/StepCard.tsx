@@ -29,7 +29,7 @@ export default function StepCard({ step, isLast, locked, upcoming, onReveal, onA
         <View style={[styles.card, cardShadow]}>
           <View style={styles.header}>
             <Text style={styles.title}>Step {step.stepNumber}</Text>
-            <Ionicons name="lock-closed-outline" size={14} color="#AEAEB2" />
+            <Ionicons name="lock-closed-outline" size={14} color="#ADA7C2" />
           </View>
         </View>
       </View>
@@ -60,7 +60,7 @@ export default function StepCard({ step, isLast, locked, upcoming, onReveal, onA
               </TouchableOpacity>
               {onAsk ? (
                 <TouchableOpacity style={styles.ghostBtn} onPress={onAsk} activeOpacity={0.7}>
-                  <Ionicons name="chatbubble-ellipses-outline" size={14} color="#1C1C1E" />
+                  <Ionicons name="chatbubble-ellipses-outline" size={14} color="#1D1A33" />
                   <Text style={styles.ghostBtnText}>Ask</Text>
                 </TouchableOpacity>
               ) : null}
@@ -90,7 +90,7 @@ export default function StepCard({ step, isLast, locked, upcoming, onReveal, onA
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={16}
-            color="#AEAEB2"
+            color="#ADA7C2"
           />
         </TouchableOpacity>
 
@@ -104,7 +104,7 @@ export default function StepCard({ step, isLast, locked, upcoming, onReveal, onA
             ) : null}
             {onAsk ? (
               <TouchableOpacity style={[styles.ghostBtn, { marginTop: 10 }]} onPress={onAsk} activeOpacity={0.7}>
-                <Ionicons name="chatbubble-ellipses-outline" size={14} color="#1C1C1E" />
+                <Ionicons name="chatbubble-ellipses-outline" size={14} color="#1D1A33" />
                 <Text style={styles.ghostBtnText}>Ask about this step</Text>
               </TouchableOpacity>
             ) : null}
@@ -116,7 +116,7 @@ export default function StepCard({ step, isLast, locked, upcoming, onReveal, onA
 }
 
 const cardShadow = {
-  shadowColor: '#000',
+  shadowColor: '#6A4CFF',
   shadowOffset: { width: 0, height: 1 },
   shadowOpacity: 0.06,
   shadowRadius: 8,
@@ -130,18 +130,18 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
     shadowRadius: 4,
     elevation: 2,
   },
   numText:   { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  connector: { width: 1, flex: 1, backgroundColor: '#E0E0E5', marginTop: 4, marginBottom: -4 },
+  connector: { width: 1, flex: 1, backgroundColor: '#E9E2F7', marginTop: 4, marginBottom: -4 },
 
   card: {
     flex: 1,
@@ -156,22 +156,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 13,
   },
-  title: { flex: 1, fontSize: 14, fontWeight: '700', color: '#1C1C1E', marginRight: 8 },
+  title: { flex: 1, fontSize: 14, fontWeight: '700', color: '#1D1A33', marginRight: 8 },
   body:  { paddingHorizontal: 13, paddingBottom: 13 },
-  explanation: { fontSize: 13, color: '#6C6C70', lineHeight: 20 },
+  explanation: { fontSize: 13, color: '#6B6585', lineHeight: 20 },
   formulaBox: {
     marginTop: 10,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#F7F2FF',
     borderRadius: 10,
     padding: 11,
     borderLeftWidth: 3,
-    borderLeftColor: '#1C1C1E',
+    borderLeftColor: '#1D1A33',
   },
-  numBubbleMuted: { backgroundColor: '#AEAEB2' },
+  numBubbleMuted: { backgroundColor: '#ADA7C2' },
   btnRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
   primaryBtn: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF',
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: 'center',
@@ -182,11 +182,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: 6,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#F7F2FF',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
-  ghostBtnText: { color: '#1C1C1E', fontSize: 13, fontWeight: '600' },
-  formulaText: { fontFamily: 'monospace', fontSize: 13, color: '#1C1C1E', fontWeight: '600' },
+  ghostBtnText: { color: '#1D1A33', fontSize: 13, fontWeight: '600' },
+  formulaText: { fontFamily: 'monospace', fontSize: 13, color: '#1D1A33', fontWeight: '600' },
 });
