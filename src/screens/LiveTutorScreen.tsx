@@ -25,6 +25,9 @@ function loadSdk(): Sdk | null {
 
 type Line = { role: 'user' | 'agent'; text: string };
 
+/** Longest live call, in seconds. Keeps the cost of any one call bounded. */
+const MAX_CALL_SECONDS = 600;
+
 async function micAllowed(): Promise<boolean> {
   if (Platform.OS !== 'android') return true; // iOS and browsers ask when the call starts
   const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
@@ -92,6 +95,8 @@ function LiveCall({ lib }: { lib: Sdk }) {
   const connected = status === 'connected';
 
   const start = async () => {
+    closing.current = false;
+    setSeconds(0);
     setProblem(null);
     setStarting(true);
     try {
@@ -129,6 +134,14 @@ function LiveCall({ lib }: { lib: Sdk }) {
     const id = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(id);
   }, [connected]);
+
+  useEffect(() => {
+    if (seconds < MAX_CALL_SECONDS || closing.current) return;
+    closing.current = true;
+    conversation.endSession();
+    setProblem('That was a great session! Calls last up to 10 minutes. Start a new one any time.');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seconds]);
 
   // The orb breathes while the tutor talks and rests while it listens.
   const pulse = useRef(new Animated.Value(0)).current;

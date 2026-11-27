@@ -14,8 +14,8 @@ and the rest of the app works as normal.
 3. **System prompt:** paste the prompt below.
 4. **LLM:** pick Claude Haiku 4.5 for the fastest, cheapest replies, or Claude Sonnet for harder subjects.
 5. **Voice:** pick any friendly voice from the library.
-6. **Advanced:** set the maximum conversation duration to 600 seconds (10 minutes). This caps what one call can cost.
-7. **Security:** turn on **Enable authentication**, so only our backend can start calls.
+6. **Optional, if your dashboard shows it:** set the maximum conversation duration to 600 seconds. The app already ends calls at 10 minutes.
+7. **Optional, if your dashboard shows it:** turn on **Enable authentication** (Security), so only our backend can start calls.
 8. Copy the **agent ID**, which starts with `agent_`.
 
 ### System prompt
@@ -60,4 +60,4 @@ Voice calls use native WebRTC modules, so they work in development and store bui
 - ElevenLabs bills about $0.08 per minute of call time on business plans, plus the LLM, which is
   billed separately. Check current pricing on your plan.
 - For free users, each live call counts as one of their 5 daily uses. Plus members have no limit,
-  but the 10-minute cap above still applies to each call.
+  but the app ends every call at 10 minutes.
