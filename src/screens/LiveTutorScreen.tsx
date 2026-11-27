@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, PermissionsAndroid, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { PermissionsAndroid, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LimitReachedError, friendlyError, startVoiceSession } from '../services/claudeService';
 import { showErrorOrPaywall } from '../utils/limit';
+import VoiceOrb from '../components/VoiceOrb';
 
 // The live voice tutor runs on ElevenLabs Agents. ElevenLabs handles listening, the tutor's
 // replies and its voice; our backend only hands out a short-lived token for each session.
@@ -149,32 +150,6 @@ function LiveCall({ lib }: { lib: Sdk }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seconds]);
 
-  // Ripples spread from the orb while the call is live: quick and bright while the tutor talks,
-  // slow and faint while it listens.
-  const ripples = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
-  const speak = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    if (!connected) {
-      ripples.forEach((r) => r.setValue(0));
-      return;
-    }
-    const duration = isSpeaking ? 1100 : 2200;
-    const loops = ripples.map((r, i) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(i * (duration / 2)),
-          Animated.timing(r, { toValue: 1, duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-          Animated.timing(r, { toValue: 0, duration: 0, useNativeDriver: true }),
-        ]),
-      ),
-    );
-    loops.forEach((l) => l.start());
-    Animated.timing(speak, { toValue: isSpeaking ? 1 : 0, duration: 250, useNativeDriver: true }).start();
-    return () => loops.forEach((l) => l.stop());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, isSpeaking]);
-  const orbScale = speak.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
-
   // Keep the newest line in view.
   const scroll = useRef<ScrollView>(null);
   useEffect(() => {
@@ -210,23 +185,7 @@ function LiveCall({ lib }: { lib: Sdk }) {
       </View>
 
       <View style={styles.hero}>
-        <View style={styles.orbWrap}>
-          {ripples.map((r, i) => (
-            <Animated.View
-              key={i}
-              style={[
-                styles.ripple,
-                {
-                  opacity: r.interpolate({ inputRange: [0, 1], outputRange: [isSpeaking ? 0.5 : 0.25, 0] }),
-                  transform: [{ scale: r.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }],
-                },
-              ]}
-            />
-          ))}
-          <Animated.View style={[styles.orb, !connected && styles.orbIdle, { transform: [{ scale: orbScale }] }]}>
-            <Ionicons name={isSpeaking ? 'volume-high' : isMuted ? 'mic-off' : 'mic'} size={30} color="#1C1C1E" />
-          </Animated.View>
-        </View>
+        <VoiceOrb size={130} active={connected} speaking={connected && isSpeaking} />
         <Text style={styles.status}>{label}</Text>
       </View>
 
@@ -274,11 +233,7 @@ const styles = StyleSheet.create({
   topTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   timer: { width: 44, color: '#AEAEB2', fontSize: 14, textAlign: 'right', fontVariant: ['tabular-nums'] },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
-  hero: { alignItems: 'center', paddingTop: 8, paddingBottom: 12 },
-  orbWrap: { width: 170, height: 170, alignItems: 'center', justifyContent: 'center' },
-  ripple: { position: 'absolute', width: 100, height: 100, borderRadius: 50, backgroundColor: '#7FD1AE' },
-  orb: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#B8F0D6', alignItems: 'center', justifyContent: 'center' },
-  orbIdle: { backgroundColor: '#5E6B66' },
+  hero: { alignItems: 'center', paddingTop: 0, paddingBottom: 10 },
   status: { color: '#FFFFFF', fontSize: 17, fontWeight: '700', textAlign: 'center' },
   title: { color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginTop: 16, textAlign: 'center' },
   transcript: { flex: 1, width: '100%', maxWidth: 720, alignSelf: 'center' },
@@ -286,9 +241,9 @@ const styles = StyleSheet.create({
   hint: { color: '#8E8E93', fontSize: 15, textAlign: 'center', marginTop: 12 },
   bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 10 },
   tutorBubble: { alignSelf: 'flex-start', backgroundColor: '#24242A', borderBottomLeftRadius: 6 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: '#B8F0D6', borderBottomRightRadius: 6 },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: '#5B4BE0', borderBottomRightRadius: 6 },
   bubbleText: { color: '#F2F2F7', fontSize: 15, lineHeight: 22 },
-  userText: { color: '#1C1C1E' },
+  userText: { color: '#FFFFFF' },
   problem: { alignItems: 'center', marginTop: 12 },
   lead: { color: '#AEAEB2', fontSize: 15, lineHeight: 21, textAlign: 'center', marginTop: 6 },
   primary: {
