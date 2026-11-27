@@ -65,6 +65,8 @@ module.exports = {
       // RevenueCat public SDK keys (safe to ship). Leave empty to hide purchases.
       revenuecatIosKey: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? '',
       revenuecatAndroidKey: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ?? '',
+      // Address shown under Help > Contact us. Leave empty to hide the contact row.
+      supportEmail: process.env.EXPO_PUBLIC_SUPPORT_EMAIL ?? '',
       eas: { projectId: process.env.EAS_PROJECT_ID ?? '' },
     },
   },
