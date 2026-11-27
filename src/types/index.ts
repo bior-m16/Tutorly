@@ -113,9 +113,25 @@ export type RootStackParamList = {
   StudySetup: { kind: StudyKind };
   Quiz: { quiz: Quiz };
   Flashcards: { deck: Deck };
+  LiveTutor: undefined;
 };
 
 export type BottomTabParamList = {
   Home: undefined;
+  Tutor: undefined;
   History: undefined;
 };
+
+/** A Tutor tab conversation, saved on the device. */
+export interface TutorTurn extends ChatTurn {
+  imageUri?: string;
+}
+
+export interface TutorChat {
+  id: string;
+  /** study_fast and study_guided are the two Study styles; chat is the everyday assistant. */
+  mode: 'study_fast' | 'study_guided' | 'chat';
+  title: string;
+  turns: TutorTurn[];
+  updatedAt: number;
+}

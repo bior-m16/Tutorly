@@ -18,6 +18,9 @@ module.exports = {
       infoPlist: {
         NSCameraUsageDescription: 'Tutorly needs camera access to scan your homework problems',
         NSPhotoLibraryUsageDescription: 'Tutorly needs photo library access to upload homework images',
+        NSMicrophoneUsageDescription: 'Tutorly uses the microphone so you can talk to your tutor',
+        // Keeps a live tutor call going if the screen locks.
+        UIBackgroundModes: ['audio'],
       },
     },
     android: {
@@ -29,6 +32,10 @@ module.exports = {
         'android.permission.CAMERA',
         'android.permission.READ_EXTERNAL_STORAGE',
         'com.android.vending.BILLING',
+        'android.permission.RECORD_AUDIO',
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+        'android.permission.ACCESS_NETWORK_STATE',
+        'android.permission.BLUETOOTH',
       ],
       package: 'com.tutorly.app',
     },
@@ -39,6 +46,16 @@ module.exports = {
     plugins: [
       ['expo-camera', { cameraPermission: 'Tutorly needs camera access to scan your homework' }],
       ['expo-image-picker', { photosPermission: 'Tutorly needs photo access to upload homework images' }],
+      [
+        'expo-speech-recognition',
+        {
+          microphonePermission: 'Tutorly uses the microphone so you can talk to your tutor',
+          speechRecognitionPermission: 'Tutorly turns your speech into text so your tutor can answer',
+        },
+      ],
+      // Live voice tutor (ElevenLabs over WebRTC).
+      '@livekit/react-native-expo-plugin',
+      '@config-plugins/react-native-webrtc',
     ],
     extra: {
       // Public by design: the backend holds the Anthropic key and checks each user's session.

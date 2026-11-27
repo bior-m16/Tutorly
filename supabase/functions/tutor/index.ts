@@ -1,4 +1,4 @@
-// Tutorly tutor API. Holds the Anthropic key server-side and enforces the free daily limit.
+// Tutorly tutor API. Holds the Anthropic and ElevenLabs keys server-side and enforces the free daily limit.
 // Deployed with verify_jwt = true: every request carries the signed-in (anonymous) user's token.
 import Anthropic from 'npm:@anthropic-ai/sdk@0.30.1';
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
@@ -115,6 +115,13 @@ const SUMMARY_LENGTH: Record<string, string> = {
   Brief: '3 to 4 key points',
   Standard: '5 to 7 key points',
   Detailed: '8 to 12 key points, each with a short supporting detail',
+};
+
+const CHAT_SYSTEMS: Record<string, string> = {
+  study_fast: `You are Tutorly, a friendly expert tutor for students. Answer the question directly and correctly, then explain why in clear steps a student can follow. Write in plain text without Markdown symbols such as #, * or **; use short numbered steps when they help. Keep answers focused: under 250 words unless the student asks for more.`,
+  study_guided: `You are Tutorly, a patient tutor who teaches by guiding. Do not give the final answer straight away. Work out where the student is, then lead them one small step at a time: give a hint or ask one short question, and wait for their reply. Praise progress, correct mistakes gently, and confirm the answer once they reach it. If they are stuck after a few tries, show the next step. Write in plain text without Markdown symbols, in under 120 words per turn.`,
+  chat: `You are Tutorly, a friendly assistant for students. Help with everyday questions, ideas, planning and messages in a warm, natural voice. Keep it appropriate for teenagers, and steer away from anything unsafe. Write in plain text without Markdown symbols, and keep replies short unless more is asked for.`,
+  voice: `You are Tutorly, a warm tutor talking with a student out loud. Your words will be spoken by a voice, so write exactly as you would speak: no lists, symbols, Markdown, emoji or equations in symbols (say "x squared", not "x^2"). Keep each turn under 60 words. Teach by guiding: explain one idea at a time and usually end with a short question to check understanding or to move on.`,
 };
 
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') ?? '' });
@@ -297,7 +304,7 @@ Deno.serve(async (req) => {
           return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
         }
       }
-      const size = SUMMARY_LENGTH[length] ?? SUMMARY_LENGTH.Standard;
+      const size = Object.prototype.hasOwnProperty.call(SUMMARY_LENGTH, length) ? SUMMARY_LENGTH[length] : SUMMARY_LENGTH.Standard;
       const instruction = `Summarise ${hasImage ? 'the material in the attached photo' : 'the text below'} in ${size}.${simple === true ? ' Use simple words a 12-year-old would understand.' : ''}`;
       const content: Array<Anthropic.Messages.ImageBlockParam | Anthropic.Messages.TextBlockParam> = [];
       if (hasImage) content.push({ type: 'image', source: { type: 'base64', media_type: mediaType, data: image } });
@@ -309,6 +316,82 @@ Deno.serve(async (req) => {
         messages: [{ role: 'user', content }],
       });
       return json({ text: text(res) });
+    }
+
+    if (body.action === 'chat') {
+      const { mode, messages: turns, image, mediaType } = body;
+      const system = Object.prototype.hasOwnProperty.call(CHAT_SYSTEMS, mode) ? CHAT_SYSTEMS[mode] : undefined;
+      if (!system || !Array.isArray(turns) || turns.length === 0 || turns.length > 40) return json({ error: 'bad_request' }, 400);
+      const history: Turn[] = turns.map((t: any) => ({
+        role: t?.role === 'assistant' ? 'assistant' : 'user',
+        text: String(t?.text ?? '').slice(0, MAX_TEXT),
+      }));
+      if (history[history.length - 1].role !== 'user') return json({ error: 'bad_request' }, 400);
+      const hasImage = typeof image === 'string' && image.length > 0;
+      if (hasImage && (image.length > MAX_IMAGE_BASE64 || !IMAGE_TYPES.includes(mediaType))) return json({ error: 'bad_image' }, 400);
+      // A conversation counts once toward the free daily limit, when it starts.
+      if (history.filter((t) => t.role === 'user').length === 1 && !(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
+      // The API needs strictly alternating roles starting with the user: merge any repeats.
+      const merged: Turn[] = [];
+      for (const t of history) {
+        const last = merged[merged.length - 1];
+        if (last && last.role === t.role) last.text += `\n\n${t.text}`;
+        else merged.push({ ...t });
+      }
+      if (merged[0].role !== 'user') merged.unshift({ role: 'user', text: '(start)' });
+      const messages: Anthropic.MessageParam[] = merged.map((t, i) => {
+        const isLast = i === merged.length - 1;
+        if (isLast && hasImage) {
+          return {
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
+              { type: 'text', text: t.text || 'Help me with this.' },
+            ],
+          };
+        }
+        return { role: t.role, content: t.text || '(no text)' };
+      });
+      const res = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: mode === 'voice' ? 300 : 1200,
+        system,
+        messages,
+      });
+      return json({ text: text(res) });
+    }
+
+    if (body.action === 'voice_session') {
+      // Live voice tutor: ElevenLabs runs the call. We mint a short-lived conversation token here
+      // so the ElevenLabs key never reaches the app.
+      const apiKey = Deno.env.get('ELEVENLABS_API_KEY');
+      const agentId = Deno.env.get('ELEVENLABS_AGENT_ID');
+      if (!apiKey || !agentId) return json({ error: 'voice_not_configured' }, 503);
+      const res = await fetch(
+        `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${encodeURIComponent(agentId)}`,
+        { headers: { 'xi-api-key': apiKey } },
+      );
+      if (!res.ok) {
+        console.error('elevenlabs token', res.status, await res.text().catch(() => ''));
+        return json({ error: 'voice_unavailable' }, 502);
+      }
+      const { token: conversationToken } = await res.json();
+      if (!conversationToken) return json({ error: 'voice_unavailable' }, 502);
+      // Each live session counts once toward the free daily limit, only once a call can actually start.
+      if (!(await isPlus(user.id))) {
+        const { data: used, error } = await admin.rpc('bump_solves', { p_user: user.id });
+        if (error) throw error;
+        if ((used as number) > FREE_SOLVES_PER_DAY) {
+          return json({ error: 'limit_reached', limit: FREE_SOLVES_PER_DAY }, 402);
+        }
+      }
+      return json({ text: 'ok', conversationToken });
     }
 
     return json({ error: 'unknown_action' }, 400);
