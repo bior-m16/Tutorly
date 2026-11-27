@@ -23,6 +23,7 @@ import { loadWriting, saveWriting } from '../hooks/useWritingHistory';
 import { showErrorOrPaywall } from '../utils/limit';
 import { showAlert } from '../utils/alert';
 import { RootStackParamList, WriteMode, WriteOptions, WritingPiece } from '../types';
+import { glow } from '../theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type OptionKey = keyof WriteOptions;
@@ -134,10 +135,10 @@ export default function WritingScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.roundBtn} onPress={() => navigation.goBack()} accessibilityLabel="Back">
-          <Ionicons name="chevron-back" size={22} color="#1C1C1E" />
+          <Ionicons name="chevron-back" size={22} color="#1D1A33" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.roundBtn} onPress={async () => setHistory(await loadWriting())} accessibilityLabel="Writing history">
-          <Ionicons name="time-outline" size={21} color="#1C1C1E" />
+          <Ionicons name="time-outline" size={21} color="#1D1A33" />
         </TouchableOpacity>
       </View>
       <Text style={styles.title}>Writing helper</Text>
@@ -159,7 +160,7 @@ export default function WritingScreen() {
               value={text}
               onChangeText={(v) => setTexts((s) => ({ ...s, [mode]: v }))}
               placeholder={tab.placeholder}
-              placeholderTextColor="#AEAEB2"
+              placeholderTextColor="#ADA7C2"
               multiline
               textAlignVertical="top"
             />
@@ -168,17 +169,17 @@ export default function WritingScreen() {
                 <Image source={{ uri: imageUri }} style={styles.thumb} />
                 <Text style={styles.attachedText}>Photo attached</Text>
                 <TouchableOpacity onPress={() => setImageUri(null)} accessibilityLabel="Remove photo">
-                  <Ionicons name="close-circle" size={22} color="#8E8E93" />
+                  <Ionicons name="close-circle" size={22} color="#8D86A6" />
                 </TouchableOpacity>
               </View>
             ) : null}
             <View style={styles.attachRow}>
               <TouchableOpacity style={styles.iconBtn} onPress={() => pickImage(false)} accessibilityLabel="Add a photo">
-                <Ionicons name="image-outline" size={20} color="#1C1C1E" />
+                <Ionicons name="image-outline" size={20} color="#1D1A33" />
               </TouchableOpacity>
               <View style={{ flex: 1 }} />
               <TouchableOpacity style={styles.cameraBtn} onPress={() => pickImage(true)}>
-                <Ionicons name="camera" size={16} color="#1C1C1E" />
+                <Ionicons name="camera" size={16} color="#1D1A33" />
                 <Text style={styles.cameraText}>Take a photo</Text>
               </TouchableOpacity>
             </View>
@@ -198,7 +199,7 @@ export default function WritingScreen() {
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.chipText, on && styles.chipTextOn]}>{v}</Text>
-                      {g.hints?.[v] ? <Text style={[styles.chipHint, on && { color: '#C7C7CC' }]}>{g.hints[v]}</Text> : null}
+                      {g.hints?.[v] ? <Text style={[styles.chipHint, on && { color: '#D3CCE6' }]}>{g.hints[v]}</Text> : null}
                     </TouchableOpacity>
                   );
                 })}
@@ -251,39 +252,39 @@ export default function WritingScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#FFFFFF' },
   topBar: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 4 },
-  roundBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 30, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.5, paddingHorizontal: 16, marginTop: 12 },
-  tabs: { flexDirection: 'row', gap: 20, paddingHorizontal: 16, marginTop: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' },
+  roundBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 30, fontWeight: '800', color: '#1D1A33', letterSpacing: -0.5, paddingHorizontal: 16, marginTop: 12 },
+  tabs: { flexDirection: 'row', gap: 20, paddingHorizontal: 16, marginTop: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(106,76,255,0.10)' },
   tab: { paddingTop: 6 },
-  tabText: { fontSize: 16, fontWeight: '700', color: '#8E8E93' },
-  tabTextOn: { color: '#1C1C1E' },
+  tabText: { fontSize: 16, fontWeight: '700', color: '#8D86A6' },
+  tabTextOn: { color: '#1D1A33' },
   tabBar: { height: 3, borderRadius: 2, marginTop: 8, backgroundColor: 'transparent' },
-  tabBarOn: { backgroundColor: '#1C1C1E' },
-  body: { flex: 1, backgroundColor: '#F7F7F9' },
+  tabBarOn: { backgroundColor: '#6A4CFF' },
+  body: { flex: 1, backgroundColor: '#FBF8FF' },
   inputCard: { margin: 16, marginBottom: 0, backgroundColor: '#FFFFFF', borderRadius: 16, padding: 14 },
-  input: { minHeight: 150, fontSize: 16, lineHeight: 23, color: '#1C1C1E', ...(Platform.OS === 'web' ? ({ outlineWidth: 0 } as object) : {}) },
-  attached: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8, padding: 8, borderRadius: 12, backgroundColor: '#F2F2F7' },
+  input: { minHeight: 150, fontSize: 16, lineHeight: 23, color: '#1D1A33', ...(Platform.OS === 'web' ? ({ outlineWidth: 0 } as object) : {}) },
+  attached: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8, padding: 8, borderRadius: 12, backgroundColor: '#F4EFFF' },
   thumb: { width: 40, height: 40, borderRadius: 8 },
-  attachedText: { flex: 1, fontSize: 13, fontWeight: '600', color: '#1C1C1E' },
+  attachedText: { flex: 1, fontSize: 13, fontWeight: '600', color: '#1D1A33' },
   attachRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  cameraBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 40, borderRadius: 12, backgroundColor: '#F2F2F7' },
-  cameraText: { fontSize: 14, fontWeight: '700', color: '#1C1C1E' },
-  groupLabel: { fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginBottom: 10, paddingHorizontal: 16 },
+  iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
+  cameraBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 40, borderRadius: 12, backgroundColor: '#F4EFFF' },
+  cameraText: { fontSize: 14, fontWeight: '700', color: '#1D1A33' },
+  groupLabel: { fontSize: 15, fontWeight: '700', color: '#1D1A33', marginBottom: 10, paddingHorizontal: 16 },
   chip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, backgroundColor: '#FFFFFF', alignItems: 'center' },
-  chipOn: { backgroundColor: '#1C1C1E' },
-  chipText: { fontSize: 14, fontWeight: '600', color: '#1C1C1E' },
+  chipOn: { backgroundColor: '#6A4CFF' },
+  chipText: { fontSize: 14, fontWeight: '600', color: '#1D1A33' },
   chipTextOn: { color: '#FFFFFF' },
-  chipHint: { fontSize: 11, color: '#8E8E93', marginTop: 2 },
-  footer: { padding: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)', backgroundColor: '#FFFFFF' },
-  generate: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1C1C1E', borderRadius: 16, paddingVertical: 16 },
+  chipHint: { fontSize: 11, color: '#8D86A6', marginTop: 2 },
+  footer: { padding: 16, borderTopWidth: 1, borderTopColor: 'rgba(106,76,255,0.10)', backgroundColor: '#FFFFFF' },
+  generate: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 16, paddingVertical: 16 },
   generateText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
   sheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, paddingBottom: 36 },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: '#1C1C1E' },
-  empty: { fontSize: 14, color: '#6C6C70', paddingVertical: 16 },
-  histRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' },
-  histMode: { fontSize: 11, fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', letterSpacing: 0.8 },
-  histPrompt: { fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginTop: 2 },
-  histOut: { fontSize: 13, color: '#6C6C70', marginTop: 2, lineHeight: 18 },
+  sheetTitle: { fontSize: 17, fontWeight: '800', color: '#1D1A33' },
+  empty: { fontSize: 14, color: '#6B6585', paddingVertical: 16 },
+  histRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(106,76,255,0.10)' },
+  histMode: { fontSize: 11, fontWeight: '800', color: '#8D86A6', textTransform: 'uppercase', letterSpacing: 0.8 },
+  histPrompt: { fontSize: 15, fontWeight: '700', color: '#1D1A33', marginTop: 2 },
+  histOut: { fontSize: 13, color: '#6B6585', marginTop: 2, lineHeight: 18 },
 });

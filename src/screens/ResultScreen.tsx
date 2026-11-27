@@ -18,6 +18,7 @@ import SubjectBadge from '../components/SubjectBadge';
 import { RootStackParamList, PracticeProblem } from '../types';
 import { generatePractice, friendlyError } from '../services/claudeService';
 import { showAlert } from '../utils/alert';
+import { glow } from '../theme';
 
 type RouteT = RouteProp<RootStackParamList, 'Result'>;
 type Nav    = NativeStackNavigationProp<RootStackParamList>;
@@ -78,7 +79,7 @@ export default function ResultScreen() {
             <Image source={{ uri: result.imageUri }} style={styles.thumbnail} resizeMode="cover" />
           ) : (
             <View style={[styles.thumbnail, styles.typedThumb]}>
-              <Ionicons name="create-outline" size={34} color="#6C6C70" />
+              <Ionicons name="create-outline" size={34} color="#6B6585" />
             </View>
           )}
           <View style={styles.metaCol}>
@@ -115,7 +116,7 @@ export default function ResultScreen() {
               onPress={() => setAnswerShown(true)}
               activeOpacity={0.7}
             >
-              <Ionicons name="eye-off-outline" size={18} color="#AEAEB2" />
+              <Ionicons name="eye-off-outline" size={18} color="#ADA7C2" />
               <Text style={styles.hiddenAnswerText}>Work through the steps first, or tap to show the answer</Text>
             </TouchableOpacity>
           )}
@@ -155,7 +156,7 @@ export default function ResultScreen() {
             />
           ))}
           <TouchableOpacity style={[styles.askBtn, shadow]} onPress={() => ask()} activeOpacity={0.7}>
-            <Ionicons name="chatbubble-ellipses-outline" size={18} color="#1C1C1E" />
+            <Ionicons name="chatbubble-ellipses-outline" size={18} color="#1D1A33" />
             <Text style={styles.askBtnText}>Ask a question about this problem</Text>
           </TouchableOpacity>
         </View>
@@ -185,10 +186,10 @@ export default function ResultScreen() {
                 activeOpacity={0.7}
               >
                 {practiceLoading ? (
-                  <ActivityIndicator color="#1C1C1E" />
+                  <ActivityIndicator color="#1D1A33" />
                 ) : (
                   <>
-                    <Ionicons name="barbell-outline" size={18} color="#1C1C1E" />
+                    <Ionicons name="barbell-outline" size={18} color="#1D1A33" />
                     <Text style={styles.askBtnText}>Practise 3 similar problems</Text>
                   </>
                 )}
@@ -215,7 +216,7 @@ export default function ResultScreen() {
             onPress={() => navigation.replace('Scan')}
             activeOpacity={0.7}
           >
-            <Ionicons name="camera-outline" size={18} color="#1C1C1E" />
+            <Ionicons name="camera-outline" size={18} color="#1D1A33" />
             <Text style={styles.scanAgainText}>Scan Another</Text>
           </TouchableOpacity>
         </View>
@@ -227,7 +228,7 @@ export default function ResultScreen() {
 }
 
 const shadow = {
-  shadowColor: '#000',
+  shadowColor: '#6A4CFF',
   shadowOffset: { width: 0, height: 1 },
   shadowOpacity: 0.06,
   shadowRadius: 8,
@@ -235,7 +236,7 @@ const shadow = {
 };
 
 const saveShadow = {
-  shadowColor: '#000',
+  shadowColor: '#6A4CFF',
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.12,
   shadowRadius: 8,
@@ -243,11 +244,11 @@ const saveShadow = {
 };
 
 const styles = StyleSheet.create({
-  safe:   { flex: 1, backgroundColor: '#EFEFEF' },
+  safe:   { flex: 1, backgroundColor: '#FFF8F5' },
   scroll: { flex: 1 },
 
   hero: { flexDirection: 'row', padding: 16, gap: 14, alignItems: 'flex-start' },
-  thumbnail: { width: 100, height: 100, borderRadius: 14, backgroundColor: '#E0E0E5' },
+  thumbnail: { width: 100, height: 100, borderRadius: 14, backgroundColor: '#E9E2F7' },
   typedThumb: { alignItems: 'center', justifyContent: 'center' },
   metaCol: { flex: 1, gap: 8, paddingTop: 4 },
 
@@ -266,22 +267,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF8F5',
     alignSelf: 'flex-start',
   },
-  stepsText: { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
+  stepsText: { fontSize: 12, fontWeight: '600', color: '#6B6585' },
 
   section: { paddingHorizontal: 16, marginBottom: 20 },
   label: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#AEAEB2',
+    color: '#ADA7C2',
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 10,
   },
   card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16 },
-  questionText: { fontSize: 15, color: '#1C1C1E', lineHeight: 23, fontWeight: '500' },
+  questionText: { fontSize: 15, color: '#1D1A33', lineHeight: 23, fontWeight: '500' },
 
   answerCard: {
     backgroundColor: '#FFFFFF',
@@ -293,10 +294,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: '#34C759',
   },
-  answerText: { flex: 1, fontSize: 17, fontWeight: '700', color: '#1C1C1E', lineHeight: 25 },
+  answerText: { flex: 1, fontSize: 17, fontWeight: '700', color: '#1D1A33', lineHeight: 25 },
 
   hiddenAnswer: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  hiddenAnswerText: { flex: 1, fontSize: 14, color: '#6C6C70', fontWeight: '500' },
+  hiddenAnswerText: { flex: 1, fontSize: 14, color: '#6B6585', fontWeight: '500' },
 
   stepsHeader: {
     flexDirection: 'row',
@@ -304,11 +305,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  toggle: { flexDirection: 'row', backgroundColor: '#E0E0E5', borderRadius: 10, padding: 2 },
+  toggle: { flexDirection: 'row', backgroundColor: '#E9E2F7', borderRadius: 10, padding: 2 },
   toggleOpt: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
   toggleOptActive: { backgroundColor: '#FFFFFF' },
-  toggleText: { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
-  toggleTextActive: { color: '#1C1C1E' },
+  toggleText: { fontSize: 12, fontWeight: '600', color: '#6B6585' },
+  toggleTextActive: { color: '#1D1A33' },
 
   askBtn: {
     flexDirection: 'row',
@@ -320,9 +321,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginTop: 6,
   },
-  askBtnText: { fontSize: 14, fontWeight: '700', color: '#1C1C1E' },
+  askBtnText: { fontSize: 14, fontWeight: '700', color: '#1D1A33' },
 
-  practiceQ: { fontSize: 15, color: '#1C1C1E', lineHeight: 22, fontWeight: '500' },
+  practiceQ: { fontSize: 15, color: '#1D1A33', lineHeight: 22, fontWeight: '500' },
   practiceA: { marginTop: 8, fontSize: 14, color: '#34C759', fontWeight: '700' },
   practiceReveal: { marginTop: 8, fontSize: 13, color: '#007AFF', fontWeight: '600' },
 
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35),
     borderRadius: 16,
     paddingVertical: 15,
   },
@@ -356,5 +357,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 15,
   },
-  scanAgainText: { fontSize: 15, fontWeight: '700', color: '#1C1C1E' },
+  scanAgainText: { fontSize: 15, fontWeight: '700', color: '#1D1A33' },
 });

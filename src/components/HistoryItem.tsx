@@ -31,7 +31,7 @@ export default function HistoryItem({ item, onPress, onDelete }: Props) {
         <Image source={{ uri: item.imageUri }} style={styles.thumb} resizeMode="cover" />
       ) : (
         <View style={[styles.thumb, styles.typedThumb]}>
-          <Ionicons name="create-outline" size={24} color="#6C6C70" />
+          <Ionicons name="create-outline" size={24} color="#6B6585" />
         </View>
       )}
 
@@ -45,7 +45,7 @@ export default function HistoryItem({ item, onPress, onDelete }: Props) {
         </View>
         <Text style={styles.question} numberOfLines={2}>{item.question}</Text>
         <View style={styles.meta}>
-          <Ionicons name="time-outline" size={11} color="#AEAEB2" />
+          <Ionicons name="time-outline" size={11} color="#ADA7C2" />
           <Text style={styles.metaText}>{formatDate(item.timestamp)}</Text>
           <Text style={styles.metaDot}>·</Text>
           <Text style={styles.metaText}>{item.steps.length} steps</Text>
@@ -57,14 +57,14 @@ export default function HistoryItem({ item, onPress, onDelete }: Props) {
         onPress={onDelete}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <Ionicons name="trash-outline" size={16} color="#AEAEB2" />
+        <Ionicons name="trash-outline" size={16} color="#ADA7C2" />
       </TouchableOpacity>
     </TouchableOpacity>
   );
 }
 
 const shadow = {
-  shadowColor: '#000',
+  shadowColor: '#6A4CFF',
   shadowOffset: { width: 0, height: 1 },
   shadowOpacity: 0.06,
   shadowRadius: 10,
@@ -81,15 +81,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 12,
   },
-  thumb:    { width: 60, height: 60, borderRadius: 10, backgroundColor: '#EFEFEF' },
+  thumb:    { width: 60, height: 60, borderRadius: 10, backgroundColor: '#FFF8F5' },
   typedThumb: { alignItems: 'center', justifyContent: 'center' },
   content:  { flex: 1, gap: 5 },
   topRow:   { flexDirection: 'row', alignItems: 'center', gap: 6 },
   diffDot:  { width: 6, height: 6, borderRadius: 3 },
   diff:     { fontSize: 11, fontWeight: '700' },
-  question: { fontSize: 13, fontWeight: '600', color: '#1C1C1E', lineHeight: 19 },
+  question: { fontSize: 13, fontWeight: '600', color: '#1D1A33', lineHeight: 19 },
   meta:     { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { fontSize: 11, color: '#AEAEB2' },
-  metaDot:  { fontSize: 11, color: '#AEAEB2' },
+  metaText: { fontSize: 11, color: '#ADA7C2' },
+  metaDot:  { fontSize: 11, color: '#ADA7C2' },
   deleteBtn:{ padding: 4 },
 });

@@ -9,6 +9,7 @@ import { generateFlashcards, generateQuiz, summaryToText } from '../services/cla
 import { saveDeck } from '../hooks/useDecks';
 import { showErrorOrPaywall } from '../utils/limit';
 import { RootStackParamList } from '../types';
+import { glow } from '../theme';
 
 type RouteT = RouteProp<RootStackParamList, 'SummaryResult'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -57,7 +58,7 @@ export default function SummaryResultScreen() {
         <View style={styles.titleRow}>
           <Text style={styles.title}>{summary.title}</Text>
           <TouchableOpacity style={styles.copyBtn} onPress={copy} accessibilityLabel="Copy summary">
-            <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color="#1C1C1E" />
+            <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={18} color="#1D1A33" />
           </TouchableOpacity>
         </View>
 
@@ -108,7 +109,7 @@ export default function SummaryResultScreen() {
             {busy === 'cards' ? <ActivityIndicator color="#FFF" /> : <><Ionicons name="albums-outline" size={18} color="#FFF" /><Text style={styles.actionText}>Make flashcards</Text></>}
           </TouchableOpacity>
           <TouchableOpacity style={[styles.action, styles.actionLight, busy === 'cards' && { opacity: 0.4 }]} onPress={() => study('quiz')} disabled={!!busy} activeOpacity={0.8}>
-            {busy === 'quiz' ? <ActivityIndicator color="#1C1C1E" /> : <><Ionicons name="help-buoy-outline" size={18} color="#1C1C1E" /><Text style={[styles.actionText, { color: '#1C1C1E' }]}>Quiz me</Text></>}
+            {busy === 'quiz' ? <ActivityIndicator color="#1D1A33" /> : <><Ionicons name="help-buoy-outline" size={18} color="#1D1A33" /><Text style={[styles.actionText, { color: '#1D1A33' }]}>Quiz me</Text></>}
           </TouchableOpacity>
         </View>
       </View>
@@ -117,30 +118,30 @@ export default function SummaryResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   content: { padding: 16, paddingBottom: 24 },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  title: { flex: 1, fontSize: 24, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.3, lineHeight: 30 },
+  title: { flex: 1, fontSize: 24, fontWeight: '800', color: '#1D1A33', letterSpacing: -0.3, lineHeight: 30 },
   copyBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  tldr: { marginTop: 16, backgroundColor: '#1C1C1E', borderRadius: 18, padding: 16 },
-  tldrLabel: { fontSize: 11, fontWeight: '800', color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
+  tldr: { marginTop: 16, backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 18, padding: 16 },
+  tldrLabel: { fontSize: 11, fontWeight: '800', color: '#ADA7C2', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
   tldrText: { fontSize: 16, lineHeight: 23, color: '#FFFFFF', fontWeight: '500' },
-  section: { fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginTop: 22, marginBottom: 10 },
+  section: { fontSize: 18, fontWeight: '700', color: '#1D1A33', marginTop: 22, marginBottom: 10 },
   card: { backgroundColor: '#FFFFFF', borderRadius: 16, paddingHorizontal: 14 },
   point: { flexDirection: 'row', gap: 12, paddingVertical: 12 },
-  pointBorder: { borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' },
+  pointBorder: { borderTopWidth: 1, borderTopColor: 'rgba(106,76,255,0.10)' },
   num: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#F4ECFF', alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-  numText: { fontSize: 12, fontWeight: '800', color: '#1C1C1E' },
-  pointText: { flex: 1, fontSize: 15, lineHeight: 22, color: '#1C1C1E' },
+  numText: { fontSize: 12, fontWeight: '800', color: '#1D1A33' },
+  pointText: { flex: 1, fontSize: 15, lineHeight: 22, color: '#1D1A33' },
   terms: { gap: 8 },
   term: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: 12 },
-  termName: { fontSize: 15, fontWeight: '800', color: '#1C1C1E' },
+  termName: { fontSize: 15, fontWeight: '800', color: '#1D1A33' },
   termMeaning: { fontSize: 14, color: '#3A3A3C', marginTop: 3, lineHeight: 20 },
-  source: { fontSize: 12, color: '#8E8E93', marginTop: 18 },
-  footer: { padding: 16, paddingTop: 10, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' },
-  footerLabel: { fontSize: 11, fontWeight: '700', color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  source: { fontSize: 12, color: '#8D86A6', marginTop: 18 },
+  footer: { padding: 16, paddingTop: 10, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: 'rgba(106,76,255,0.10)' },
+  footerLabel: { fontSize: 11, fontWeight: '700', color: '#ADA7C2', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   footerRow: { flexDirection: 'row', gap: 10 },
-  action: { flex: 1, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1C1C1E', borderRadius: 16, paddingVertical: 15 },
-  actionLight: { backgroundColor: '#F2F2F7' },
+  action: { flex: 1, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 16, paddingVertical: 15 },
+  actionLight: { backgroundColor: '#F4EFFF' },
   actionText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
 });

@@ -27,7 +27,7 @@ export default function SubjectBadge({ subject, size = 'md' }: Props) {
 
   return (
     <View style={[styles.badge, isSm && styles.badgeSm, isLg && styles.badgeLg]}>
-      <Ionicons name={icon} size={isSm ? 11 : isLg ? 16 : 13} color="#6C6C70" />
+      <Ionicons name={icon} size={isSm ? 11 : isLg ? 16 : 13} color="#6B6585" />
       <Text style={[styles.label, isSm && styles.labelSm, isLg && styles.labelLg]}>
         {subject}
       </Text>
@@ -44,11 +44,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20,
     alignSelf: 'flex-start',
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF8F5',
   },
   badgeSm: { paddingHorizontal: 8, paddingVertical: 3 },
   badgeLg: { paddingHorizontal: 14, paddingVertical: 8 },
-  label:   { fontSize: 12, fontWeight: '600', color: '#6C6C70' },
+  label:   { fontSize: 12, fontWeight: '600', color: '#6B6585' },
   labelSm: { fontSize: 11 },
   labelLg: { fontSize: 15 },
 });

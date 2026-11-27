@@ -29,21 +29,21 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 const HEADER = {
   headerShown: true,
   headerBackTitle: 'Back',
-  headerStyle: { backgroundColor: '#FFFFFF' },
-  headerTintColor: '#1C1C1E',
+  headerStyle: { backgroundColor: '#FFF8F5' },
+  headerTintColor: '#6A4CFF',
   headerShadowVisible: false,
-  headerTitleStyle: { fontWeight: '700' as const, fontSize: 17 },
+  headerTitleStyle: { fontWeight: '700' as const, fontSize: 17, color: '#1D1A33' },
 };
 
 const NAV_THEME = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#EFEFEF',
+    background: '#FFF8F5',
     card: '#FFFFFF',
-    border: 'rgba(0,0,0,0.06)',
-    text: '#1C1C1E',
-    primary: '#1C1C1E',
+    border: 'rgba(106,76,255,0.10)',
+    text: '#1D1A33',
+    primary: '#6A4CFF',
     notification: '#FF3B30',
   },
 };
@@ -63,12 +63,12 @@ function TabNavigator() {
             <Ionicons
               name={focused ? active : inactive}
               size={size}
-              color={focused ? '#1C1C1E' : '#AEAEB2'}
+              color={focused ? '#6A4CFF' : '#ADA7C2'}
             />
           );
         },
-        tabBarActiveTintColor: '#1C1C1E',
-        tabBarInactiveTintColor: '#AEAEB2',
+        tabBarActiveTintColor: '#6A4CFF',
+        tabBarInactiveTintColor: '#ADA7C2',
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
         headerShown: false,
@@ -98,10 +98,10 @@ export default function AppNavigator() {
             headerShown: true,
             title: 'Solution',
             headerBackTitle: 'Back',
-            headerStyle: { backgroundColor: '#FFFFFF' },
-            headerTintColor: '#1C1C1E',
+            headerStyle: { backgroundColor: '#FFF8F5' },
+            headerTintColor: '#6A4CFF',
             headerShadowVisible: false,
-            headerTitleStyle: { fontWeight: '700', fontSize: 17 },
+            headerTitleStyle: { fontWeight: '700', fontSize: 17, color: '#1D1A33' },
           }}
         />
         <Stack.Screen
@@ -111,10 +111,10 @@ export default function AppNavigator() {
             headerShown: true,
             title: 'Ask your tutor',
             headerBackTitle: 'Back',
-            headerStyle: { backgroundColor: '#FFFFFF' },
-            headerTintColor: '#1C1C1E',
+            headerStyle: { backgroundColor: '#FFF8F5' },
+            headerTintColor: '#6A4CFF',
             headerShadowVisible: false,
-            headerTitleStyle: { fontWeight: '700', fontSize: 17 },
+            headerTitleStyle: { fontWeight: '700', fontSize: 17, color: '#1D1A33' },
           }}
         />
         <Stack.Screen name="TypeQuestion" component={TypeQuestionScreen} options={{ ...HEADER, title: 'Type a question' }} />
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',
     borderTopWidth: 0,
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.06,
     shadowRadius: 12,

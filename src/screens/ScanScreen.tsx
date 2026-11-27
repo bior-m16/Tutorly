@@ -127,7 +127,7 @@ export default function ScanScreen() {
     return (
       <View style={styles.webContainer}>
         <TouchableOpacity style={styles.webClose} onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={24} color="#1C1C1E" />
+          <Ionicons name="close" size={24} color="#1D1A33" />
         </TouchableOpacity>
 
         <View style={styles.webBracketBox}>
@@ -136,7 +136,7 @@ export default function ScanScreen() {
           <View style={[styles.wCorner, styles.wBL]} />
           <View style={[styles.wCorner, styles.wBR]} />
           <TouchableOpacity style={styles.webIconCircle} onPress={handleTakePhotoWeb} activeOpacity={0.7}>
-            <Ionicons name="camera-outline" size={40} color="#1C1C1E" />
+            <Ionicons name="camera-outline" size={40} color="#1D1A33" />
           </TouchableOpacity>
         </View>
 
@@ -153,13 +153,13 @@ export default function ScanScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.webBtn, { marginTop: 12 }]} onPress={handlePickFromGallery} activeOpacity={0.7}>
-          <Ionicons name="images-outline" size={20} color="#6C6C70" />
+          <Ionicons name="images-outline" size={20} color="#6B6585" />
           <Text style={styles.webBtnText}>Choose from Gallery</Text>
         </TouchableOpacity>
 
         {analyzing && (
           <View style={styles.webAnalyzing}>
-            <ActivityIndicator size="large" color="#1C1C1E" />
+            <ActivityIndicator size="large" color="#1D1A33" />
             <Text style={styles.webAnalyzingText}>Analyzing with Claude AI…</Text>
           </View>
         )}
@@ -173,7 +173,7 @@ export default function ScanScreen() {
     return (
       <View style={styles.permContainer}>
         <View style={styles.permIconBox}>
-          <Ionicons name="camera-outline" size={38} color="#1C1C1E" />
+          <Ionicons name="camera-outline" size={38} color="#1D1A33" />
         </View>
         <Text style={styles.permTitle}>Camera Access Needed</Text>
         <Text style={styles.permText}>
@@ -255,7 +255,7 @@ export default function ScanScreen() {
             />
           )}
           <View style={styles.analyzingCard}>
-            <ActivityIndicator size="large" color="#1C1C1E" />
+            <ActivityIndicator size="large" color="#1D1A33" />
             <Text style={styles.analyzingTitle}>Analyzing…</Text>
             <Text style={styles.analyzingText}>Claude AI is solving your problem</Text>
           </View>
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   // ── Web ──────────────────────────────────────────────────────────────
   webContainer: {
     flex: 1,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF8F5',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  wCorner: { position: 'absolute', width: 26, height: 26, borderColor: '#AEAEB2' },
+  wCorner: { position: 'absolute', width: 26, height: 26, borderColor: '#ADA7C2' },
   wTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2 },
   wTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2 },
   wBL: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2 },
@@ -297,16 +297,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 3,
   },
-  webTitle: { fontSize: 22, fontWeight: '700', color: '#1C1C1E', marginBottom: 8 },
+  webTitle: { fontSize: 22, fontWeight: '700', color: '#1D1A33', marginBottom: 8 },
   webSub: {
     fontSize: 13,
-    color: '#6C6C70',
+    color: '#6B6585',
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -318,21 +318,21 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: 28,
     paddingVertical: 14,
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
-  webBtnPrimary: { backgroundColor: '#1C1C1E' },
-  webBtnText: { fontSize: 15, fontWeight: '600', color: '#6C6C70' },
+  webBtnPrimary: { backgroundColor: '#6A4CFF' },
+  webBtnText: { fontSize: 15, fontWeight: '600', color: '#6B6585' },
   webAnalyzing: { marginTop: 32, alignItems: 'center', gap: 12 },
-  webAnalyzingText: { fontSize: 14, color: '#6C6C70' },
+  webAnalyzingText: { fontSize: 14, color: '#6B6585' },
 
   // ── Permission ────────────────────────────────────────────────────────
   permContainer: {
     flex: 1,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF8F5',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
@@ -345,24 +345,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 3,
     marginBottom: 8,
   },
-  permTitle: { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
-  permText: { fontSize: 14, color: '#6C6C70', textAlign: 'center', lineHeight: 21 },
+  permTitle: { fontSize: 20, fontWeight: '700', color: '#1D1A33' },
+  permText: { fontSize: 14, color: '#6B6585', textAlign: 'center', lineHeight: 21 },
   permBtn: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF',
     borderRadius: 16,
     paddingHorizontal: 32,
     paddingVertical: 14,
     marginTop: 8,
   },
   permBtnText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
-  permGallery: { color: '#6C6C70', fontSize: 14, fontWeight: '600' },
+  permGallery: { color: '#6B6585', fontSize: 14, fontWeight: '600' },
 
   // ── Camera overlay ────────────────────────────────────────────────────
   overlay: { ...StyleSheet.absoluteFillObject },
@@ -460,12 +460,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     gap: 10,
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 8,
   },
-  analyzingTitle: { fontSize: 18, fontWeight: '700', color: '#1C1C1E' },
-  analyzingText: { fontSize: 13, color: '#6C6C70' },
+  analyzingTitle: { fontSize: 18, fontWeight: '700', color: '#1D1A33' },
+  analyzingText: { fontSize: 13, color: '#6B6585' },
 });

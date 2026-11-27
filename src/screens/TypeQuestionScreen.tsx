@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { solveTypedQuestion } from '../services/claudeService';
 import { showErrorOrPaywall } from '../utils/limit';
 import { RootStackParamList } from '../types';
+import { glow } from '../theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -50,7 +51,7 @@ export default function TypeQuestionScreen() {
             value={question}
             onChangeText={setQuestion}
             placeholder="Type or paste your homework question…"
-            placeholderTextColor="#AEAEB2"
+            placeholderTextColor="#ADA7C2"
             multiline
             autoFocus
             textAlignVertical="top"
@@ -87,7 +88,7 @@ export default function TypeQuestionScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   body: { flex: 1, padding: 16 },
   input: {
     minHeight: 160,
@@ -96,19 +97,21 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     lineHeight: 23,
-    color: '#1C1C1E',
+    color: '#1D1A33',
+    borderWidth: 1.5,
+    borderColor: 'rgba(122,92,255,0.35)',
   },
   examples: { marginTop: 20, gap: 8 },
-  examplesLabel: { fontSize: 11, fontWeight: '700', color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: 1 },
+  examplesLabel: { fontSize: 11, fontWeight: '700', color: '#ADA7C2', textTransform: 'uppercase', letterSpacing: 1 },
   example: { backgroundColor: '#FFFFFF', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 14 },
-  exampleText: { fontSize: 14, color: '#1C1C1E' },
+  exampleText: { fontSize: 14, color: '#1D1A33' },
   solveBtn: {
     margin: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35),
     borderRadius: 16,
     paddingVertical: 16,
   },

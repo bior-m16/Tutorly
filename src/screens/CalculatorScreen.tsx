@@ -28,7 +28,7 @@ export default function CalculatorScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.roundBtn} onPress={() => navigation.goBack()} accessibilityLabel="Back">
-          <Ionicons name="chevron-back" size={22} color="#1C1C1E" />
+          <Ionicons name="chevron-back" size={22} color="#1D1A33" />
         </TouchableOpacity>
         <View style={styles.segment}>
           {(['scientific', 'converter'] as Tab[]).map((t) => (
@@ -196,7 +196,7 @@ function Scientific(props: {
         </Text>
         {(done ?? expr) ? (
           <TouchableOpacity style={styles.explain} onPress={() => props.onExplain(done ?? expr)} activeOpacity={0.8}>
-            <Ionicons name="sparkles" size={14} color="#1C1C1E" />
+            <Ionicons name="sparkles" size={14} color="#1D1A33" />
             <Text style={styles.explainText}>Explain step by step</Text>
           </TouchableOpacity>
         ) : null}
@@ -212,7 +212,7 @@ function Scientific(props: {
                 onPress={k.on}
                 activeOpacity={0.6}
               >
-                <Text style={[styles.sciText, k.small && { fontSize: 13 }, k.active && { color: '#1C1C1E' }]}>{k.label}</Text>
+                <Text style={[styles.sciText, k.small && { fontSize: 13 }, k.active && { color: '#1D1A33' }]}>{k.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -266,22 +266,22 @@ function Converter(props: { onHistory: () => void }) {
           <Text style={[styles.convValue, { fontSize: fitFont(input || '0', 48) }]} numberOfLines={1}>{input || '0'}</Text>
           <TouchableOpacity style={styles.unitBtn} onPress={() => setPicking('from')}>
             <Text style={styles.unitText}>{from.label}</Text>
-            <Ionicons name="chevron-expand" size={16} color="#6C6C70" />
+            <Ionicons name="chevron-expand" size={16} color="#6B6585" />
           </TouchableOpacity>
         </View>
         <View style={styles.convMid}>
           <TouchableOpacity onPress={swap} style={styles.swap} accessibilityLabel="Swap units">
-            <Ionicons name="swap-vertical" size={20} color="#1C1C1E" />
+            <Ionicons name="swap-vertical" size={20} color="#1D1A33" />
           </TouchableOpacity>
           <View style={styles.convLine} />
         </View>
         <View style={styles.convRow}>
-          <Text style={[styles.convValue, { color: '#6C6C70', fontSize: fitFont(outText, 48) }]} numberOfLines={1}>
+          <Text style={[styles.convValue, { color: '#6B6585', fontSize: fitFont(outText, 48) }]} numberOfLines={1}>
             {outText}
           </Text>
           <TouchableOpacity style={styles.unitBtn} onPress={() => setPicking('to')}>
             <Text style={styles.unitText}>{to.label}</Text>
-            <Ionicons name="chevron-expand" size={16} color="#6C6C70" />
+            <Ionicons name="chevron-expand" size={16} color="#6B6585" />
           </TouchableOpacity>
         </View>
       </View>
@@ -312,7 +312,7 @@ function Converter(props: { onHistory: () => void }) {
                   }}
                 >
                   <Text style={[styles.unitRowText, selected && { fontWeight: '800' }]}>{u.label}</Text>
-                  {selected ? <Ionicons name="checkmark" size={18} color="#1C1C1E" /> : null}
+                  {selected ? <Ionicons name="checkmark" size={18} color="#1D1A33" /> : null}
                 </TouchableOpacity>
               );
             })}
@@ -365,7 +365,7 @@ function Keypad(props: {
               accessibilityLabel={k.label}
             >
               {k.icon ? (
-                <Ionicons name={k.icon} size={24} color="#1C1C1E" />
+                <Ionicons name={k.icon} size={24} color="#1D1A33" />
               ) : (
                 <Text style={[styles.keyText, k.kind === 'op' && { color: '#FFF' }]}>{k.label}</Text>
               )}
@@ -380,59 +380,59 @@ function Keypad(props: {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#FFFFFF' },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8 },
-  roundBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  segment: { flexDirection: 'row', backgroundColor: '#F2F2F7', borderRadius: 12, padding: 3 },
+  roundBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
+  segment: { flexDirection: 'row', backgroundColor: '#F4EFFF', borderRadius: 12, padding: 3 },
   segBtn: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 9 },
-  segActive: { backgroundColor: '#1C1C1E' },
-  segText: { fontSize: 14, fontWeight: '700', color: '#6C6C70' },
+  segActive: { backgroundColor: '#6A4CFF' },
+  segText: { fontSize: 14, fontWeight: '700', color: '#6B6585' },
   segTextActive: { color: '#FFFFFF' },
 
   display: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 20, paddingBottom: 8, minHeight: 120 },
   exprScroll: { flexGrow: 1, justifyContent: 'flex-end' },
-  expr: { fontSize: 22, color: '#6C6C70', textAlign: 'right' },
-  result: { fontSize: 52, fontWeight: '700', color: '#1C1C1E', textAlign: 'right', marginTop: 4 },
-  preview: { fontSize: 30, fontWeight: '600', color: '#AEAEB2' },
+  expr: { fontSize: 22, color: '#6B6585', textAlign: 'right' },
+  result: { fontSize: 52, fontWeight: '700', color: '#1D1A33', textAlign: 'right', marginTop: 4 },
+  preview: { fontSize: 30, fontWeight: '600', color: '#ADA7C2' },
   explain: {
     alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6,
-    backgroundColor: '#F2F2F7', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: '#F4EFFF', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 6,
   },
-  explainText: { fontSize: 13, fontWeight: '700', color: '#1C1C1E' },
+  explainText: { fontSize: 13, fontWeight: '700', color: '#1D1A33' },
 
   sciPad: { paddingHorizontal: 12, gap: 6, marginBottom: 6 },
   sciRow: { flexDirection: 'row', gap: 6 },
-  sciKey: { flex: 1, height: 40, borderRadius: 10, backgroundColor: '#F7F7F9', alignItems: 'center', justifyContent: 'center' },
-  sciKeyOn: { backgroundColor: '#E5E5EA' },
+  sciKey: { flex: 1, height: 40, borderRadius: 10, backgroundColor: '#FBF8FF', alignItems: 'center', justifyContent: 'center' },
+  sciKeyOn: { backgroundColor: '#ECE6F8' },
   sciText: { fontSize: 15, fontWeight: '600', color: '#48484A' },
 
   pad: { paddingHorizontal: 12, paddingBottom: 8, gap: 8 },
   padRow: { flexDirection: 'row', gap: 8 },
-  key: { flex: 1, height: 58, borderRadius: 16, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  keyNum: { backgroundColor: '#E5E5EA' },
-  keyOp: { backgroundColor: '#1C1C1E' },
-  keyText: { fontSize: 24, fontWeight: '700', color: '#1C1C1E' },
+  key: { flex: 1, height: 58, borderRadius: 16, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
+  keyNum: { backgroundColor: '#ECE6F8' },
+  keyOp: { backgroundColor: '#6A4CFF' },
+  keyText: { fontSize: 24, fontWeight: '700', color: '#1D1A33' },
 
   catBar: { flexGrow: 0, marginTop: 4 },
-  catChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 16, backgroundColor: '#F2F2F7' },
-  catChipOn: { backgroundColor: '#1C1C1E' },
+  catChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 16, backgroundColor: '#F4EFFF' },
+  catChipOn: { backgroundColor: '#6A4CFF' },
   catText: { fontSize: 13, fontWeight: '700', color: '#48484A' },
   convBox: { flex: 1, justifyContent: 'center', paddingHorizontal: 20 },
   convRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', gap: 8 },
-  convValue: { flex: 1, fontSize: 48, fontWeight: '700', color: '#1C1C1E', textAlign: 'right' },
+  convValue: { flex: 1, fontSize: 48, fontWeight: '700', color: '#1D1A33', textAlign: 'right' },
   unitBtn: { flexDirection: 'row', alignItems: 'center', gap: 2, paddingBottom: 10, minWidth: 64 },
-  unitText: { fontSize: 18, color: '#6C6C70', fontWeight: '600' },
+  unitText: { fontSize: 18, color: '#6B6585', fontWeight: '600' },
   convMid: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 14 },
-  swap: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
+  swap: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
   convLine: { flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.08)' },
 
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
   sheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, paddingBottom: 36 },
   sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: '#1C1C1E' },
+  sheetTitle: { fontSize: 17, fontWeight: '800', color: '#1D1A33' },
   clear: { fontSize: 14, fontWeight: '700', color: '#FF3B30' },
-  empty: { fontSize: 14, color: '#6C6C70', paddingVertical: 16 },
-  histRow: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)', alignItems: 'flex-end' },
-  histExpr: { fontSize: 14, color: '#6C6C70' },
-  histResult: { fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginTop: 2 },
-  unitRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' },
-  unitRowText: { fontSize: 16, color: '#1C1C1E' },
+  empty: { fontSize: 14, color: '#6B6585', paddingVertical: 16 },
+  histRow: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(106,76,255,0.10)', alignItems: 'flex-end' },
+  histExpr: { fontSize: 14, color: '#6B6585' },
+  histResult: { fontSize: 18, fontWeight: '700', color: '#1D1A33', marginTop: 2 },
+  unitRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(106,76,255,0.10)' },
+  unitRowText: { fontSize: 16, color: '#1D1A33' },
 });

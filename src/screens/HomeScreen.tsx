@@ -16,6 +16,9 @@ import ScanButton from '../components/ScanButton';
 import HistoryItem from '../components/HistoryItem';
 import { RootStackParamList } from '../types';
 import { purchasesAvailable, hasPlus, showPaywall } from '../services/subscriptions';
+import GlowBackdrop from '../components/GlowBackdrop';
+import { LinearGradient } from 'expo-linear-gradient';
+import { C, NEON, glow } from '../theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -24,16 +27,17 @@ type Tool = {
   sub: string;
   icon: keyof typeof Ionicons.glyphMap;
   tint: string;
+  accent: string;
   go?: (nav: Nav) => void;
 };
 
 const TOOLS: Tool[] = [
-  { label: 'Quiz Me', sub: 'Test yourself on any topic', icon: 'help-buoy-outline', tint: '#E8F0FF', go: (n) => n.navigate('StudySetup', { kind: 'quiz' }) },
-  { label: 'Type it', sub: 'Solve a typed question', icon: 'create-outline', tint: '#EAF8EE', go: (n) => n.navigate('TypeQuestion') },
-  { label: 'Flashcards', sub: 'Flip through key ideas', icon: 'albums-outline', tint: '#FFF4E0', go: (n) => n.navigate('StudySetup', { kind: 'flashcards' }) },
-  { label: 'Calculator', sub: 'Scientific and unit converter', icon: 'calculator-outline', tint: '#FFE9EC', go: (n) => n.navigate('Calculator') },
-  { label: 'Summarize', sub: 'Key points from any text', icon: 'document-text-outline', tint: '#F4ECFF', go: (n) => n.navigate('Summarize') },
-  { label: 'Writing help', sub: 'Essays, outlines, emails', icon: 'pencil-outline', tint: '#E6F6F8', go: (n) => n.navigate('Writing') },
+  { label: 'Quiz Me', sub: 'Test yourself on any topic', icon: 'help-buoy-outline', tint: '#EAF0FF', accent: '#3D6BFF', go: (n) => n.navigate('StudySetup', { kind: 'quiz' }) },
+  { label: 'Type it', sub: 'Solve a typed question', icon: 'create-outline', tint: '#F1E9FF', accent: '#7A5CFF', go: (n) => n.navigate('TypeQuestion') },
+  { label: 'Flashcards', sub: 'Flip through key ideas', icon: 'albums-outline', tint: '#FFE8F4', accent: '#E0449A', go: (n) => n.navigate('StudySetup', { kind: 'flashcards' }) },
+  { label: 'Calculator', sub: 'Scientific and unit converter', icon: 'calculator-outline', tint: '#FFF0E6', accent: '#F07A3C', go: (n) => n.navigate('Calculator') },
+  { label: 'Summarize', sub: 'Key points from any text', icon: 'document-text-outline', tint: '#F1E9FF', accent: '#9B5CFF', go: (n) => n.navigate('Summarize') },
+  { label: 'Writing help', sub: 'Essays, outlines, emails', icon: 'pencil-outline', tint: '#EAF0FF', accent: '#5B5BFF', go: (n) => n.navigate('Writing') },
 ];
 
 export default function HomeScreen() {
@@ -58,13 +62,14 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#EFEFEF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF8F5" />
+      <GlowBackdrop />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.brand}>Tutorly</Text>
+            <Text style={styles.brand}>Tutorly<Text style={styles.brandDot}>.</Text></Text>
             <Text style={styles.tagline}>AI Homework Helper</Text>
           </View>
           <View style={[styles.statsBubble, shadow.btn]}>
@@ -79,15 +84,21 @@ export default function HomeScreen() {
           onPress={() => navigation.navigate('TypeQuestion')}
           activeOpacity={0.8}
         >
-          <Ionicons name="search" size={18} color="#AEAEB2" />
+          <Ionicons name="search" size={18} color="#ADA7C2" />
           <Text style={styles.askText}>Ask any homework question…</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Scan')} hitSlop={10}>
-            <Ionicons name="camera-outline" size={20} color="#1C1C1E" />
+            <Ionicons name="camera-outline" size={20} color="#1D1A33" />
           </TouchableOpacity>
         </TouchableOpacity>
 
         {/* Scan card */}
         <View style={[styles.scanCard, shadow.card]}>
+          <LinearGradient
+            colors={['rgba(61,107,255,0.07)', 'rgba(155,92,255,0.05)', 'rgba(255,93,177,0.07)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]}
+          />
           <ScanButton onPress={() => navigation.navigate('Scan')} size={80} />
           <Text style={styles.scanTitle}>Scan a Problem</Text>
           <Text style={styles.scanSub}>
@@ -99,20 +110,21 @@ export default function HomeScreen() {
             onPress={() => navigation.navigate('Scan')}
             activeOpacity={0.7}
           >
-            <Ionicons name="images-outline" size={20} color="#6C6C70" />
+            <Ionicons name="images-outline" size={20} color="#6B6585" />
             <Text style={styles.galleryBtnText}>Choose from Gallery</Text>
           </TouchableOpacity>
         </View>
 
         {/* Plus upsell */}
         {purchasesAvailable() && !plus ? (
-          <TouchableOpacity style={[styles.plusCard, shadow.btn]} onPress={goPlus} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.plusCard, glow(C.pink, 18, 0.3)]} onPress={goPlus} activeOpacity={0.8}>
+            <LinearGradient colors={[...NEON]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]} />
             <Ionicons name="sparkles" size={20} color="#FFD60A" />
             <View style={{ flex: 1 }}>
               <Text style={styles.plusTitle}>Tutorly Plus</Text>
               <Text style={styles.plusSub}>Unlimited solutions. Free plan: 5 a day.</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
+            <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.85)" />
           </TouchableOpacity>
         ) : null}
 
@@ -129,7 +141,7 @@ export default function HomeScreen() {
                 activeOpacity={0.75}
               >
                 <View style={[styles.toolIcon, { backgroundColor: t.tint }]}>
-                  <Ionicons name={t.icon} size={22} color="#1C1C1E" />
+                  <Ionicons name={t.icon} size={22} color={t.accent} />
                 </View>
                 <Text style={styles.toolLabel}>{t.label}</Text>
                 <Text style={styles.toolSub}>{t.sub}</Text>
@@ -165,20 +177,8 @@ export default function HomeScreen() {
 }
 
 const shadow = {
-  card: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 18,
-    elevation: 4,
-  },
-  btn: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
+  card: glow(C.neon, 22, 0.14),
+  btn: glow(C.neon, 12, 0.10),
 };
 
 const styles = StyleSheet.create({
@@ -190,13 +190,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     padding: 16,
     borderRadius: 16,
-    backgroundColor: '#1C1C1E',
+    overflow: 'hidden',
   },
   plusTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  plusSub: { color: '#AEAEB2', fontSize: 12, marginTop: 2 },
+  plusSub: { color: 'rgba(255,255,255,0.85)', fontSize: 12, marginTop: 2 },
 
-  safe:   { flex: 1, backgroundColor: '#EFEFEF' },
-  scroll: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe:   { flex: 1, backgroundColor: '#FFF8F5' },
+  scroll: { flex: 1, backgroundColor: 'transparent' },
 
   header: {
     flexDirection: 'row',
@@ -206,8 +206,9 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 22,
   },
-  brand:     { fontSize: 30, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.5 },
-  tagline:   { fontSize: 13, color: '#6C6C70', marginTop: 2, fontWeight: '500' },
+  brand:     { fontSize: 30, fontWeight: '800', color: '#1D1A33', letterSpacing: -0.5 },
+  brandDot:  { color: '#FF5DB1' },
+  tagline:   { fontSize: 13, color: '#6B6585', marginTop: 2, fontWeight: '500' },
   statsBubble: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
@@ -215,8 +216,8 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     alignItems: 'center',
   },
-  statsNum:   { fontSize: 22, fontWeight: '800', color: '#1C1C1E' },
-  statsLabel: { fontSize: 11, color: '#6C6C70', fontWeight: '600', marginTop: 1 },
+  statsNum:   { fontSize: 22, fontWeight: '800', color: '#1D1A33' },
+  statsLabel: { fontSize: 11, color: '#6B6585', fontWeight: '600', marginTop: 1 },
 
   scanCard: {
     marginHorizontal: 16,
@@ -225,24 +226,26 @@ const styles = StyleSheet.create({
     padding: 28,
     alignItems: 'center',
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(122,92,255,0.12)',
   },
   scanTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#1C1C1E',
+    color: '#1D1A33',
     marginTop: 18,
     letterSpacing: -0.3,
   },
   scanSub: {
     fontSize: 14,
-    color: '#6C6C70',
+    color: '#6B6585',
     marginTop: 6,
     textAlign: 'center',
     lineHeight: 20,
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(106,76,255,0.10)',
     width: '100%',
     marginVertical: 20,
   },
@@ -252,12 +255,12 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 24,
     paddingVertical: 14,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF8F5',
     borderRadius: 18,
     width: '100%',
     justifyContent: 'center',
   },
-  galleryBtnText: { fontSize: 15, fontWeight: '600', color: '#6C6C70' },
+  galleryBtnText: { fontSize: 15, fontWeight: '600', color: '#6B6585' },
 
   section: { paddingHorizontal: 16, marginBottom: 24 },
   sectionRow: {
@@ -269,11 +272,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1C1C1E',
+    color: '#1D1A33',
     marginBottom: 12,
     letterSpacing: -0.2,
   },
-  seeAll: { fontSize: 14, fontWeight: '600', color: '#6C6C70' },
+  seeAll: { fontSize: 14, fontWeight: '700', color: '#6A4CFF' },
 
   askBar: {
     flexDirection: 'row',
@@ -286,11 +289,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
   },
-  askText: { flex: 1, fontSize: 15, color: '#AEAEB2' },
+  askText: { flex: 1, fontSize: 15, color: '#ADA7C2' },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
   tool: { width: '48.3%', backgroundColor: '#FFFFFF', borderRadius: 18, padding: 14 },
   toolIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  toolLabel: { fontSize: 15, fontWeight: '700', color: '#1C1C1E' },
-  toolSub: { fontSize: 12, color: '#6C6C70', marginTop: 2 },
+  toolLabel: { fontSize: 15, fontWeight: '700', color: '#1D1A33' },
+  toolSub: { fontSize: 12, color: '#6B6585', marginTop: 2 },
 });

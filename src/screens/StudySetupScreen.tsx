@@ -19,6 +19,7 @@ import { saveDeck, useDecks } from '../hooks/useDecks';
 import { showErrorOrPaywall } from '../utils/limit';
 import { showAlert } from '../utils/alert';
 import { RootStackParamList } from '../types';
+import { glow } from '../theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type RouteT = RouteProp<RootStackParamList, 'StudySetup'>;
@@ -131,7 +132,7 @@ export default function StudySetupScreen() {
             value={topic}
             onChangeText={setTopic}
             placeholder="e.g. Photosynthesis, the French Revolution, fractions"
-            placeholderTextColor="#AEAEB2"
+            placeholderTextColor="#ADA7C2"
             multiline
             textAlignVertical="top"
           />
@@ -198,44 +199,44 @@ function Row(props: {
       activeOpacity={0.7}
     >
       <View style={styles.rowIcon}>
-        <Ionicons name={props.icon} size={18} color="#1C1C1E" />
+        <Ionicons name={props.icon} size={18} color="#1D1A33" />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.rowLabel} numberOfLines={1}>{props.label}</Text>
         {props.detail ? <Text style={styles.rowDetail}>{props.detail}</Text> : null}
       </View>
       {props.loading ? (
-        <ActivityIndicator color="#1C1C1E" />
+        <ActivityIndicator color="#1D1A33" />
       ) : props.soon ? (
         <Text style={styles.soon}>Soon</Text>
       ) : (
-        <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
+        <Ionicons name="chevron-forward" size={18} color="#ADA7C2" />
       )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   content: { padding: 16, paddingBottom: 32 },
-  lead: { fontSize: 15, color: '#6C6C70', lineHeight: 21, marginBottom: 8 },
+  lead: { fontSize: 15, color: '#6B6585', lineHeight: 21, marginBottom: 8 },
   label: {
-    fontSize: 11, fontWeight: '700', color: '#AEAEB2', textTransform: 'uppercase',
+    fontSize: 11, fontWeight: '700', color: '#ADA7C2', textTransform: 'uppercase',
     letterSpacing: 1, marginTop: 18, marginBottom: 8,
   },
   card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 12 },
-  input: { minHeight: 80, fontSize: 15, lineHeight: 21, color: '#1C1C1E', padding: 4 },
+  input: { minHeight: 80, fontSize: 15, lineHeight: 21, color: '#1D1A33', padding: 4 },
   primary: {
-    marginTop: 10, backgroundColor: '#1C1C1E', borderRadius: 12, paddingVertical: 14, alignItems: 'center',
+    marginTop: 10, backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 12, paddingVertical: 14, alignItems: 'center',
   },
   primaryText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-  rowIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: '#F2F2F7', alignItems: 'center', justifyContent: 'center' },
-  rowLabel: { fontSize: 15, fontWeight: '600', color: '#1C1C1E' },
-  rowDetail: { fontSize: 12, color: '#6C6C70', marginTop: 1 },
-  soon: { fontSize: 12, fontWeight: '700', color: '#AEAEB2' },
-  sep: { height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginVertical: 4, marginLeft: 46 },
+  rowIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: '#F4EFFF', alignItems: 'center', justifyContent: 'center' },
+  rowLabel: { fontSize: 15, fontWeight: '600', color: '#1D1A33' },
+  rowDetail: { fontSize: 12, color: '#6B6585', marginTop: 1 },
+  soon: { fontSize: 12, fontWeight: '700', color: '#ADA7C2' },
+  sep: { height: 1, backgroundColor: 'rgba(106,76,255,0.10)', marginVertical: 4, marginLeft: 46 },
   starters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   starter: { backgroundColor: '#FFFFFF', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
-  starterText: { fontSize: 13, fontWeight: '500', color: '#1C1C1E' },
+  starterText: { fontSize: 13, fontWeight: '500', color: '#1D1A33' },
 });

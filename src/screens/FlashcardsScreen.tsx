@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Flashcard, RootStackParamList } from '../types';
+import { glow } from '../theme';
 
 type RouteT = RouteProp<RootStackParamList, 'Flashcards'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -57,7 +58,7 @@ export default function FlashcardsScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['bottom']}>
         <View style={styles.doneWrap}>
-          <Ionicons name={learning.length === 0 ? 'trophy' : 'albums'} size={56} color="#1C1C1E" />
+          <Ionicons name={learning.length === 0 ? 'trophy' : 'albums'} size={56} color="#1D1A33" />
           <Text style={styles.doneTitle}>
             {learning.length === 0 ? 'You know them all!' : `${known} of ${cards.length} down`}
           </Text>
@@ -105,9 +106,9 @@ export default function FlashcardsScreen() {
             <Text style={styles.tapHint}>Tap to flip</Text>
           </Animated.View>
           <Animated.View style={[styles.card, styles.cardBack, { transform: [{ perspective: 1000 }, { rotateY: backRotate }] }]}>
-            <Text style={[styles.side, { color: '#8E8E93' }]}>Answer</Text>
+            <Text style={[styles.side, { color: '#8D86A6' }]}>Answer</Text>
             <Text style={styles.back}>{card.back}</Text>
-            <Text style={[styles.tapHint, { color: '#8E8E93' }]}>Tap to flip back</Text>
+            <Text style={[styles.tapHint, { color: '#8D86A6' }]}>Tap to flip back</Text>
           </Animated.View>
         </Pressable>
       </View>
@@ -127,11 +128,11 @@ export default function FlashcardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   body: { flex: 1, padding: 16 },
-  progressTrack: { height: 6, borderRadius: 3, backgroundColor: '#DCDCE0', overflow: 'hidden' },
-  progressFill: { height: 6, backgroundColor: '#1C1C1E' },
-  counter: { fontSize: 12, fontWeight: '700', color: '#AEAEB2', marginTop: 14, marginBottom: 14 },
+  progressTrack: { height: 6, borderRadius: 3, backgroundColor: '#E3DCF2', overflow: 'hidden' },
+  progressFill: { height: 6, backgroundColor: '#6A4CFF' },
+  counter: { fontSize: 12, fontWeight: '700', color: '#ADA7C2', marginTop: 14, marginBottom: 14 },
   cardArea: { flex: 1, maxHeight: 460 },
   card: {
     ...StyleSheet.absoluteFillObject,
@@ -141,17 +142,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backfaceVisibility: 'hidden',
-    shadowColor: '#000',
+    shadowColor: '#6A4CFF',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 18,
     elevation: 4,
   },
-  cardBack: { backgroundColor: '#1C1C1E' },
-  side: { position: 'absolute', top: 20, left: 24, fontSize: 11, fontWeight: '700', color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: 1 },
-  front: { fontSize: 24, fontWeight: '700', color: '#1C1C1E', textAlign: 'center', lineHeight: 32 },
+  cardBack: { backgroundColor: '#6A4CFF' },
+  side: { position: 'absolute', top: 20, left: 24, fontSize: 11, fontWeight: '700', color: '#ADA7C2', textTransform: 'uppercase', letterSpacing: 1 },
+  front: { fontSize: 24, fontWeight: '700', color: '#1D1A33', textAlign: 'center', lineHeight: 32 },
   back: { fontSize: 19, fontWeight: '500', color: '#FFFFFF', textAlign: 'center', lineHeight: 27 },
-  tapHint: { position: 'absolute', bottom: 20, fontSize: 12, color: '#AEAEB2', fontWeight: '600' },
+  tapHint: { position: 'absolute', bottom: 20, fontSize: 12, color: '#ADA7C2', fontWeight: '600' },
   actions: { flexDirection: 'row', gap: 12, padding: 16 },
   action: { flex: 1, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', borderRadius: 16, paddingVertical: 16 },
   learningBtn: { backgroundColor: '#FFE9DF' },
@@ -159,12 +160,12 @@ const styles = StyleSheet.create({
   actionText: { fontSize: 15, fontWeight: '700' },
   primary: {
     flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#1C1C1E', borderRadius: 16, paddingVertical: 16, alignSelf: 'stretch', marginTop: 8,
+    backgroundColor: '#6A4CFF', ...glow('#7A5CFF', 16, 0.35), borderRadius: 16, paddingVertical: 16, alignSelf: 'stretch', marginTop: 8,
   },
   primaryText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   secondary: { paddingVertical: 14, alignSelf: 'stretch', alignItems: 'center', marginTop: 4 },
-  secondaryText: { color: '#1C1C1E', fontSize: 15, fontWeight: '600' },
+  secondaryText: { color: '#1D1A33', fontSize: 15, fontWeight: '600' },
   doneWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  doneTitle: { fontSize: 24, fontWeight: '800', color: '#1C1C1E', marginTop: 16, textAlign: 'center' },
-  doneSub: { fontSize: 15, color: '#6C6C70', marginTop: 6, marginBottom: 24, textAlign: 'center' },
+  doneTitle: { fontSize: 24, fontWeight: '800', color: '#1D1A33', marginTop: 16, textAlign: 'center' },
+  doneSub: { fontSize: 15, color: '#6B6585', marginTop: 6, marginBottom: 24, textAlign: 'center' },
 });

@@ -85,7 +85,7 @@ export default function AskScreen() {
             </View>
           ))}
 
-          {loading ? <ActivityIndicator style={{ marginTop: 12 }} color="#1C1C1E" /> : null}
+          {loading ? <ActivityIndicator style={{ marginTop: 12 }} color="#1D1A33" /> : null}
           {error ? <Text style={styles.error}>{error}</Text> : null}
         </ScrollView>
 
@@ -95,7 +95,7 @@ export default function AskScreen() {
             value={input}
             onChangeText={setInput}
             placeholder="Ask your tutor…"
-            placeholderTextColor="#AEAEB2"
+            placeholderTextColor="#ADA7C2"
             multiline
             onSubmitEditing={() => send(input)}
           />
@@ -114,22 +114,22 @@ export default function AskScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#EFEFEF' },
+  safe: { flex: 1, backgroundColor: '#FFF8F5' },
   content: { padding: 16, paddingBottom: 24 },
 
   context: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: 14, marginBottom: 14 },
-  contextLabel: { fontSize: 12, fontWeight: '700', color: '#AEAEB2', marginBottom: 6 },
-  contextText: { fontSize: 14, color: '#1C1C1E', lineHeight: 20 },
+  contextLabel: { fontSize: 12, fontWeight: '700', color: '#ADA7C2', marginBottom: 6 },
+  contextText: { fontSize: 14, color: '#1D1A33', lineHeight: 20 },
 
   suggestions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { backgroundColor: '#FFFFFF', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
-  chipText: { fontSize: 13, color: '#1C1C1E', fontWeight: '500' },
+  chipText: { fontSize: 13, color: '#1D1A33', fontWeight: '500' },
 
   bubble: { maxWidth: '85%', borderRadius: 16, padding: 12, marginTop: 10 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: '#1C1C1E' },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: '#6A4CFF' },
   tutorBubble: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF' },
   userText: { color: '#FFFFFF', fontSize: 14, lineHeight: 20 },
-  tutorText: { color: '#1C1C1E', fontSize: 14, lineHeight: 21 },
+  tutorText: { color: '#1D1A33', fontSize: 14, lineHeight: 21 },
 
   error: { color: '#FF3B30', fontSize: 13, marginTop: 10 },
 
@@ -143,18 +143,18 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     maxHeight: 120,
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#F7F2FF',
     borderRadius: 18,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
-    color: '#1C1C1E',
+    color: '#1D1A33',
   },
   sendBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#6A4CFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
