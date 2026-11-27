@@ -10,7 +10,7 @@ and the rest of the app works as normal.
 ## 1. Create the agent
 
 1. Sign up at elevenlabs.io and open **Agents**. Create a new blank agent named "Tia".
-2. **First message:** `Hi! I'm Tia, your Tutorly tutor. What are we working on today?`
+2. **First message:** `Hi! I'm Tia, your live tutor. What are we working on today?`
 3. **System prompt:** paste the prompt below.
 4. **LLM:** pick Claude Haiku 4.5 for the fastest, cheapest replies, or Claude Sonnet for harder subjects.
 5. **Voice:** pick any friendly voice from the library.
