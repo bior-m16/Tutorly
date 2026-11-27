@@ -37,7 +37,7 @@ to learning, gently steer back to studying.
 ## 2. Create an API key
 
 In ElevenLabs, open **Developers > API keys** and create a key. Give it access to
-**Conversational AI / Agents** only.
+**ElevenAgents: Write** only (Read is not enough to start a call). Copy the value that starts with `sk_`: it is shown once, when the key is created. The ID in the key list will not work.
 
 ## 3. Add both as Supabase secrets
 
