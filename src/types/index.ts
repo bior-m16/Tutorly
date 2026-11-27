@@ -114,12 +114,15 @@ export type RootStackParamList = {
   Quiz: { quiz: Quiz };
   Flashcards: { deck: Deck };
   LiveTutor: undefined;
+  Plus: undefined;
+  Help: undefined;
 };
 
 export type BottomTabParamList = {
   Home: undefined;
   Tutor: undefined;
   History: undefined;
+  Profile: undefined;
 };
 
 /** A Tutor tab conversation, saved on the device. */

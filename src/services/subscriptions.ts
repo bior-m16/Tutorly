@@ -70,3 +70,67 @@ export async function showPaywall(): Promise<boolean> {
   const result = await sdk().RevenueCatUI.presentPaywall({ displayCloseButton: true });
   return result === 'PURCHASED' || result === 'RESTORED';
 }
+
+export interface Plan {
+  id: string;
+  /** e.g. "Monthly", "3 months", "Yearly" */
+  label: string;
+  /** Store price as the store formats it, e.g. "$9.99". */
+  price: string;
+  /** e.g. "/month" */
+  period: string;
+  /** Free-trial text from the store, if the plan has one. */
+  trial?: string;
+}
+
+const PERIOD: Record<string, { label: string; period: string; order: number }> = {
+  WEEKLY: { label: 'Weekly', period: '/week', order: 0 },
+  MONTHLY: { label: 'Monthly', period: '/month', order: 1 },
+  TWO_MONTH: { label: '2 months', period: '/2 months', order: 2 },
+  THREE_MONTH: { label: '3 months', period: '/3 months', order: 3 },
+  SIX_MONTH: { label: '6 months', period: '/6 months', order: 4 },
+  ANNUAL: { label: 'Yearly', period: '/year', order: 5 },
+};
+
+let packages: Record<string, unknown> = {};
+
+/** The Plus plans set up in RevenueCat, with real store prices. Empty where purchases are unavailable. */
+export async function getPlans(): Promise<Plan[]> {
+  if (!purchasesAvailable()) return [];
+  await configure();
+  const offerings = await sdk().Purchases.getOfferings();
+  const list = offerings.current?.availablePackages ?? [];
+  packages = {};
+  return list
+    .map((p) => {
+      packages[p.identifier] = p;
+      const meta = PERIOD[p.packageType] ?? { label: p.product.title, period: '', order: 9 };
+      const intro = p.product.introPrice;
+      const trial =
+        intro && intro.price === 0 ? `${intro.periodNumberOfUnits}-${intro.periodUnit.toLowerCase()} free trial` : undefined;
+      return { id: p.identifier, label: meta.label, price: p.product.priceString, period: meta.period, trial, order: meta.order };
+    })
+    .sort((a, b) => a.order - b.order)
+    .map(({ order, ...plan }) => plan);
+}
+
+/** Buys a plan from getPlans(). Resolves true when Plus is active, false if the user cancelled. */
+export async function buyPlan(id: string): Promise<boolean> {
+  const pkg = packages[id];
+  if (!pkg) throw new Error('That plan is no longer available. Please reopen this page.');
+  try {
+    const { customerInfo } = await sdk().Purchases.purchasePackage(pkg as never);
+    return PLUS_ENTITLEMENT in customerInfo.entitlements.active;
+  } catch (err: any) {
+    if (err?.userCancelled) return false;
+    throw err;
+  }
+}
+
+/** Restores an earlier purchase on this store account. Resolves true if Plus is active afterwards. */
+export async function restorePlus(): Promise<boolean> {
+  if (!purchasesAvailable()) return false;
+  await configure();
+  const info = await sdk().Purchases.restorePurchases();
+  return PLUS_ENTITLEMENT in info.entitlements.active;
+}

@@ -21,6 +21,9 @@ import SummaryResultScreen from '../screens/SummaryResultScreen';
 import QuizScreen from '../screens/QuizScreen';
 import TutorScreen from '../screens/TutorScreen';
 import LiveTutorScreen from '../screens/LiveTutorScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import PlusScreen from '../screens/PlusScreen';
+import HelpScreen from '../screens/HelpScreen';
 import { RootStackParamList, BottomTabParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -57,6 +60,7 @@ function TabNavigator() {
             Home:    ['home',  'home-outline'],
             Tutor:   ['chatbubbles', 'chatbubbles-outline'],
             History: ['time',  'time-outline'],
+            Profile: ['person-circle', 'person-circle-outline'],
           };
           const [active, inactive] = map[route.name] ?? ['home', 'home-outline'];
           return (
@@ -77,6 +81,7 @@ function TabNavigator() {
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
       <Tab.Screen name="Tutor" component={TutorScreen} options={{ title: 'Tutor' }} />
       <Tab.Screen name="History" component={HistoryScreen} options={{ title: 'History' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
 }
@@ -127,6 +132,8 @@ export default function AppNavigator() {
         <Stack.Screen name="Writing" component={WritingScreen} />
         <Stack.Screen name="WritingResult" component={WritingResultScreen} options={{ ...HEADER, title: 'Your writing' }} />
         <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ ...HEADER, title: 'Flashcards' }} />
+        <Stack.Screen name="Plus" component={PlusScreen} options={{ presentation: 'modal' }} />
+        <Stack.Screen name="Help" component={HelpScreen} options={{ ...HEADER, title: 'Help and feedback' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
